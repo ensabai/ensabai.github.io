@@ -1,0 +1,12 @@
+---
+title: "Trabajo Fin de Grado - Ciencia de Datos"
+author: "Enrique Sayas Bailach"
+date: "2025-07-10"
+categories: [mascarillas, ciencia de datos, análisis]
+image: "escudo_logo_UV.jpg"
+---
+
+Trabajo Fin de Grado acerca del impacto del uso de mascarillas durante la pandemia
+del COVID-19 en distritos escolares del estado de Massachusetts. 
+
+![](TFG_EnriqueSayas.pdf){width=100% height=800px}

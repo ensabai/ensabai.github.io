@@ -1,0 +1,11 @@
+---
+title: "Clasificación de canciones según su género en base a sus características"
+author: "Carlos Gila Blanco, Enrique Sayas Bailach"
+date: "2023-06-20"
+categories: [clasificación, ciencia de datos, música]
+image: "GCD.png"
+---
+
+Comparativa de diferentes modelos de clasificación haciendo uso del conjunto de datos [Prediction of music genre](https://www.kaggle.com/datasets/vicsuperman/prediction-of-music-genre).
+
+![](Tarea%20PF2.pdf){width="100%" height="800px"}

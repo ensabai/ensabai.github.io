@@ -1,0 +1,17 @@
+---
+title: "Enrique Sayas Bailach"
+image: foto.jpg
+about:
+  template: jolla
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com/in/enrique-sayas-bailach
+    - icon: github
+      text: Github
+      href: https://github.com/ensabai
+
+---
+
+Científico de Datos con formación en análisis estadístico, modelado predictivo y visualización de datos. Aplicación práctica de técnicas analíticas para la mejora de procesos, la toma de decisiones y la generación de valor. Conocimientos en resolución de problemas de optimización en contextos logísticos, control de versiones y metodologías de trabajo ágiles. Capacidad para transformar datos complejos en soluciones claras y útiles.
+

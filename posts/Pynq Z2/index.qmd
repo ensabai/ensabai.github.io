@@ -1,0 +1,12 @@
+---
+title: "Estación MedioAmbiental Inteligente"
+author: "Carlos Gila Blanco, Enrique Sayas Bailach"
+date: "2025-1-10"
+categories: [IoT, ciencia de datos, PYNQ Z2]
+image: "GCD.png"
+---
+
+Desarrollo de una Estación MedioAmbiental Inteligente como proyecto IoT (Internet 
+de las cosas) mediante el uso de la placa PYNQ Z2 y el Arduino Shield.
+
+![](Documentación.pdf){width="100%" height="800px"}

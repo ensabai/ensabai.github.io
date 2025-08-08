@@ -1,0 +1,11 @@
+---
+title: "Análisis de Series Temporales"
+author: "Carlos Gila Blanco, Enrique Sayas Bailach"
+date: "2023-12-22"
+categories: [series temporales, ciencia de datos, R]
+image: "GCD.png"
+---
+
+Implementación de modelos Holt-Winters y ARIMA para el análisis de series temporales.
+
+![](Memoria.pdf){width="100%" height="800px"}

@@ -1,0 +1,29 @@
+project:
+  type: website
+  output-dir: "docs"
+
+website:
+  title: "Enrique Sayas Bailach"
+  navbar:
+    left: 
+      - text: "Inicio"
+        file: index.qmd
+      - text: "Portfolio"
+        file: portfolio.qmd
+      - text: "CV"
+        file: cv.qmd
+    right:
+      - icon: github
+        href: https://github.com/ensabai
+      - icon: linkedin
+        href: https://linkedin.com/in/enrique-sayas-bailach
+
+lang: es
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+
+
+
