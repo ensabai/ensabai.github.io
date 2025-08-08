@@ -1,0 +1,58 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Enrique Sayas Bailach",
+    "section": "",
+    "text": "Científico de Datos con formación en análisis estadístico, modelado predictivo y visualización de datos. Aplicación práctica de técnicas analíticas para la mejora de procesos, la toma de decisiones y la generación de valor. Conocimientos en resolución de problemas de optimización en contextos logísticos, control de versiones y metodologías de trabajo ágiles. Capacidad para transformar datos complejos en soluciones claras y útiles."
+  },
+  {
+    "objectID": "posts/VODS/index.html",
+    "href": "posts/VODS/index.html",
+    "title": "1er Premio en el Concurso de Visualización de Datos de la ciudad de Valencia 2023",
+    "section": "",
+    "text": "Primer Premio obtenido en el Concurso de Visualización de Datos de la ciudad de Valencia 2023 organizado por la Universitat de Valencia en colaboración con el Ayuntamiento de Valencia."
+  },
+  {
+    "objectID": "posts/Trabajo Fin de Grado - Ciencia de Datos/index.html",
+    "href": "posts/Trabajo Fin de Grado - Ciencia de Datos/index.html",
+    "title": "Trabajo Fin de Grado - Ciencia de Datos",
+    "section": "",
+    "text": "Trabajo Fin de Grado acerca del impacto del uso de mascarillas durante la pandemia del COVID-19 en distritos escolares del estado de Massachusetts."
+  },
+  {
+    "objectID": "posts/Clasificación Canciones/index.html",
+    "href": "posts/Clasificación Canciones/index.html",
+    "title": "Clasificación de canciones según su género en base a sus características",
+    "section": "",
+    "text": "Comparativa de diferentes modelos de clasificación haciendo uso del conjunto de datos Prediction of music genre."
+  },
+  {
+    "objectID": "posts/Pynq Z2/index.html",
+    "href": "posts/Pynq Z2/index.html",
+    "title": "Estación MedioAmbiental Inteligente",
+    "section": "",
+    "text": "Desarrollo de una Estación MedioAmbiental Inteligente como proyecto IoT (Internet de las cosas) mediante el uso de la placa PYNQ Z2 y el Arduino Shield."
+  },
+  {
+    "objectID": "posts/MDP/index.html",
+    "href": "posts/MDP/index.html",
+    "title": "Maximum Diversity Problem (MDP): Implementación de GRASP y Path-relinking.",
+    "section": "",
+    "text": "Implementación de GRASP y Path-relinking para la resolución del problema de Maximum Diversity Problem (MDP)"
+  },
+  {
+    "objectID": "posts/Analisis Series Temporales/index.html",
+    "href": "posts/Analisis Series Temporales/index.html",
+    "title": "Análisis de Series Temporales",
+    "section": "",
+    "text": "Implementación de modelos Holt-Winters y ARIMA para el análisis de series temporales."
+  },
+  {
+    "objectID": "portfolio.html",
+    "href": "portfolio.html",
+    "title": "Mi Portfolio",
+    "section": "",
+    "text": "Trabajo Fin de Grado - Ciencia de Datos\n\n\n\n\n\n\nmascarillas\n\n\nciencia de datos\n\n\nanálisis\n\n\n\n\n\n\n\n\n\n10 jul 2025\n\n\nEnrique Sayas Bailach\n\n\n\n\n\n\n\n\n\n\n\n\nMaximum Diversity Problem (MDP): Implementación de GRASP y Path-relinking.\n\n\n\n\n\n\nMDP\n\n\nciencia de datos\n\n\n\n\n\n\n\n\n\n16 may 2025\n\n\nCarles Vicent Adam Castañer, Luna Xinping Moreno Gómez, Enrique Sayas Bailach\n\n\n\n\n\n\n\n\n\n\n\n\nEstación MedioAmbiental Inteligente\n\n\n\n\n\n\nIoT\n\n\nciencia de datos\n\n\nPYNQ Z2\n\n\n\n\n\n\n\n\n\n10 ene 2025\n\n\nCarlos Gila Blanco, Enrique Sayas Bailach\n\n\n\n\n\n\n\n\n\n\n\n\nAnálisis de Series Temporales\n\n\n\n\n\n\nseries temporales\n\n\nciencia de datos\n\n\nR\n\n\n\n\n\n\n\n\n\n22 dic 2023\n\n\nCarlos Gila Blanco, Enrique Sayas Bailach\n\n\n\n\n\n\n\n\n\n\n\n\n1er Premio en el Concurso de Visualización de Datos de la ciudad de Valencia 2023\n\n\n\n\n\n\nvalencia\n\n\nciencia de datos\n\n\ndatos abiertos\n\n\n\n\n\n\n\n\n\n22 sept 2023\n\n\nJosep Antoni Girbés Plaza, Luna Xinping Moreno Gómez, Carles Vicent Adam Castañer, Carlos Gila Blanco, Enrique Sayas Bailach\n\n\n\n\n\n\n\n\n\n\n\n\nClasificación de canciones según su género en base a sus características\n\n\n\n\n\n\nclasificación\n\n\nciencia de datos\n\n\nmúsica\n\n\n\n\n\n\n\n\n\n20 jun 2023\n\n\nCarlos Gila Blanco, Enrique Sayas Bailach\n\n\n\n\n\n\nNo hay resultados"
+  }
+]
