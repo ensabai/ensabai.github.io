@@ -1,0 +1,1361 @@
+---
+title: "Detección de las Fases del Sueño mediante XGBoost."
+author: "Carlos Gila Blanco, Enrique Sayas Bailach"
+date: "2025-1-23"
+categories: [Salud, ciencia de datos, XGBoost, Python]
+image: "GCD.png"
+jupyter: 
+    kernelspec:
+        name: "ads"
+        language: "python"
+        display_name: "ads"
+---
+
+# 0. Introducción
+
+El sueño es un proceso biológico compuesto por una serie de fases que permiten la restauración física y mental del cuerpo. Estas fases, que incluyen el sueño ligero (N1 y N2), el sueño profundo (N3) y el sueño REM. La comprensión de estas etapas resulta esencial en el ámbito de la analítica de datos en salud, particularmente en el diagnóstico y tratamiento de trastornos del sueño.
+
+En este trabajo se aborda el análisis de datos polisomnográficos (PSG) utilizando el conjunto de datos ISRUC-Sleep, que contiene en su tercer subgrupo las fases del sueño recogidas en 10 pacientes. En el proyecto se aplicarán distintos modelos XGBoost para automatizar la detección de las distintas fases del sueño a través de la extracción de características de los archivos .edf.
+
+# 1. Librerías
+
+```{python}
+import numpy as np
+import mne
+import yasa
+import pandas as pd
+import matplotlib.pyplot as plt
+import xgboost as xgb
+import seaborn as sns
+import shap
+from sklearn.preprocessing import label_binarize
+from sklearn.metrics import roc_curve, auc, classification_report
+from sklearn import metrics
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.model_selection import GridSearchCV
+from ydata_profiling import ProfileReport
+```
+
+# 2. Objetivos
+
+El principal objetivo de este trabajo es desarrollar modelos XGBoost que permitan detectar las fases del sueño automáticamente. Para ello, se realizará lo siguiente:
+
+- Realizar la importación de los datos, así como un análisis exploratorio de los mismos.
+- Realizar la extracción de características por medio de la librería YASA.
+- Crear un modelo XGBoost especializado para cada una de las 5 fases, así como un modelo surrogate para facilitar la interpretación.
+- Obtener los resultados en test y compararlos con los resultados del artículo de referencia.
+- Crear un dashboard que permita al médico el fácil manejo del modelo, con gráficos e información que le permitan interactuar y lograr una interpretación más sencilla.
+
+# 3. Datos
+
+## 3.1 Información sobre la base de datos
+
+Lee: [http://dataset.isr.uc.pt/ISRUC_Sleep/Content.pdf](http://dataset.isr.uc.pt/ISRUC_Sleep/Content.pdf)
+
+Cada archivo comprimido contiene:  
+- Un archivo `.rec`, que en realidad es un archivo `.edf` (RENÓMBRALO de `.rec` a `.edf`).  
+- Dos archivos `.txt` que son las anotaciones de los especialistas.  
+- Dos archivos `.xlsx` que contienen la misma información (Etapa) y más datos (muy útiles si deseas entender por qué se cometen errores, descartar épocas de calidad cuestionable, etc.).  
+
+El PSG está compuesto por señales de los siguientes canales:
+
+- EEG (F3, C3, O1, F4, C4 y O2)  
+- Electrooculograma (EOG), derecho e izquierdo (ROC y LOC)  
+- Electrocardiograma (ECG)  
+- Tipos de EMG: un m. submentalis (EMG del mentón, X1) y dos m. tibialis (EMGs de las piernas)  
+- Las referencias se colocaron en los lóbulos de las orejas izquierda y derecha (A1, A2).
+
+## 3.2 Carga de los datos
+
+```{python}
+def load_raw(test=False):
+
+    raw_list = []
+    if test:
+        n1 = 9
+        n2 = 10
+    else:
+        n1 = 1
+        n2 = 8
+
+    for n in range(n1,n2+1):
+        path = "data/" + str(n) + "/" + str(n) + ".edf"
+
+        raw = mne.io.read_raw_edf(path, preload=True, verbose=False)
+
+        # Change the freq. to 100 Hz to reduce compute time (we don't have any frequencies of interest above 50Hz)
+        raw.resample(100)
+
+        # Filter to remove base line (very low freqs. produced by breathing, leg movement, etc.) 
+        raw.filter(0.3, 49, verbose=False)
+
+        # Append to the list
+        raw_list.append(raw)
+    
+    return raw_list
+
+def observe_data(raw_list: list):
+
+    fig, axes = plt.subplots(len(raw_list), 1, sharex=True, sharey=False, figsize = (len(raw_list),len(raw_list)*2))
+    cont = 1
+    for (ax, raw) in zip(axes, raw_list):
+
+        # Observe the data
+        sf = raw.info['sfreq']
+        chan = raw.ch_names
+
+        # Warning: change the scale of the data if we access it directly!
+        data = raw.get_data() * 1e6 #m icroVolts (mne works in V)
+        data = data[:,:-int(30*sf)] # Delete te last 30s because the reference article does so
+
+        # Plot the signal
+        times = np.arange(data.shape[-1]) / sf
+        time_range= slice(int(50*sf), int(100*sf)) # Choose some seconds range to plot
+        ax.plot(times[time_range], data[0, time_range], lw=1.5, color='k')
+        ax.set_title('Patient ' + str(cont))
+        cont += 1
+    
+    fig.suptitle("Datos del sueño EEG")
+    fig.supxlabel("Tiempo (segundos)")
+    fig.supylabel("Amplitud (V)")
+    plt.show()
+    return
+```
+
+A continuación se cargan los primeros 8 pacientes, los cuales serán utilizados para el conjunto de entrenamiento y validación.
+
+```{python}
+raw_train_list = load_raw()
+```
+
+### 3.2.1 Etiquetas de Fases del Sueño
+
+A continuación, se detalla la codificación de las fases en los archivos del conjunto de datos ISRUC-SLEEP. 
+
+Ten cuidado, ya que no existe el valor 4 (anteriormente se distinguía una fase adicional).
+
+* 0 -> W (Vigilia)  
+* 1 -> N1  
+* 2 -> N2  
+* 3 -> N3  
+* 5 -> REM  
+
+El formato predeterminado del hipnograma en YASA es un vector entero unidimensional donde:
+
+* -2 = Sin puntuación  
+* -1 = Artefacto / Movimiento  
+* 0 = Vigilia (Wake)  
+* 1 = Sueño N1  
+* 2 = Sueño N2  
+* 3 = Sueño N3  
+* 4 = Sueño REM
+
+```{python}
+def load_labels(test=False):
+
+    labels_list = []
+    if test:
+        n1 = 9
+        n2 = 10
+    else:
+        n1 = 1
+        n2 = 8
+
+    for n in range(n1,n2+1):
+        path = "data/" + str(n) + "/" + str(n) + "_1.txt"
+
+        labels = pd.read_csv(path, header=None).squeeze("columns")
+
+        labels[labels == 5] = 4  # Recode REM from 5 to 4 for YASA compatibility
+        labels = labels[:-30]  # Remove last 30 epochs (each epoch is 30s)
+
+        # Append to the list
+        labels_list.append(labels)
+    
+    return labels_list
+
+def observe_labels(labels_list):
+
+    # Create a mapping for sleep stages
+    sleep_stages = {
+        0: 'Wake',
+        1: 'N1 sleep',
+        2: 'N2 sleep',
+        3: 'N3 sleep',
+        4: 'REM sleep'
+    }
+
+    fig, axes = plt.subplots(int(len(labels_list) / 2), 2, sharex=True, sharey=False, figsize = (len(labels_list)+5,len(labels_list)))
+    contx = 0
+    conty = 0
+    cont = 1
+
+    for labels in labels_list:
+
+        # Calculate accumulated time in each phase (in minutes)
+        accumulated_time = labels.value_counts() * 0.5  # Each sample is 30 seconds, so multiply by 0.5 to get minutes
+
+        # Plot the distribution of sleep stages
+        sns.barplot(x = accumulated_time.index.map(sleep_stages), y=accumulated_time.values, order=sleep_stages.values(), ax=axes[conty,contx])
+        axes[conty, contx].set_ylabel("")
+        axes[conty, contx].set_xlabel("")
+        axes[conty, contx].set_title('Paciente ' + str(cont))
+        conty += 1
+        cont += 1
+
+        if conty == 4:
+            conty = 0
+            contx = 1
+    
+    fig.suptitle("Tiempo Acumulado por Etapa del Sueño")
+    fig.supxlabel("Estados del Sueño")
+    fig.supylabel("Tiempo (minutos)")
+    plt.show()
+    return
+
+def observe_hypnogram(labels_list):
+
+    fig, axes = plt.subplots(int(len(labels_list) / 2), 2, sharex=True, sharey=False, figsize = (len(labels_list)+5,len(labels_list)))
+    contx = 0
+    conty = 0
+    cont = 1
+
+    for labels in labels_list:
+        yasa.plot_hypnogram(labels, ax=axes[conty,contx])
+        axes[conty, contx].set_ylabel("")
+        axes[conty, contx].set_xlabel("")
+        axes[conty, contx].set_title('Paciente ' + str(cont))
+        conty += 1
+        cont += 1
+        
+        if conty == 4:
+            conty = 0
+            contx = 1
+    
+    fig.suptitle("Hipnograma")
+    fig.supxlabel("Tiempo (horas)")
+    fig.supylabel("Estado")
+    plt.show()
+    return
+
+labels_train_list = load_labels()
+
+observe_labels(labels_train_list)
+```
+
+```{python}
+observe_hypnogram(labels_train_list)
+```
+
+# 4. Extracción de características
+
+Utilizaremos la biblioteca `yasa` para generar características cada 30 segundos de polisomnografía, que usaremos para la clasificación de etapas del sueño.
+
+## 4.1 Biblioteca `yasa`
+
+YASA (Yet Another Spindle Algorithm) es una herramienta en Python diseñada para analizar datos de polisomnografía (PSG) y clasificar etapas del sueño.
+
+Principales funcionalidades:
+
+<li>Clasificación de etapas del sueño: Automáticamente identifica N1, N2, N3 y REM.</li>
+<li>Detección de eventos: Husos, ondas lentas y movimientos oculares rápidos.</li>
+<li>Rechazo de artefactos: Limpia señales EEG para mejorar la calidad del análisis.</li>
+<li>Análisis espectral: Potencia por bandas, pendiente $1/f$, acoplamiento fase-amplitud, etc.</li>
+<li>Hipnogramas: Genera gráficos y estadísticas sobre las etapas del sueño.</li>
+
+Se trata de una buena herramienta, práctica y enfocada en la investigación del sueño.  
+
+Cabe destacar que YASA elimina los picos de sueño, por eso no es necesario utilizar los datos normalizados y en su lugar se hace uso de los originales.
+
+## 4.2 Características extraídas
+
+Para cada época de 30 segundos y cada canal, se calculan las siguientes características:
+
+1. abspow (Potencia absoluta)
+
+Es la energía total de la señal en un rango de frecuencias específico (por ejemplo, delta, theta, alfa, beta, etc.).
+<li>En EEG: Refleja la amplitud promedio de las oscilaciones cerebrales en un rango determinado y se mide en microvoltios al cuadrado.</li>
+<li>En EMG: Un aumento indica mayor actividad muscular (movimientos o contracciones).</li>
+<li>En EOG: Un aumento puede indicar movimientos oculares intensos (parpadeos o REM).</li>
+
+2. alpha (Potencia en el rango alfa)
+
+<li>En EEG: Mide la potencia de la señal EEG en el rango alfa (8-13 Hz), comúnmente asociada con estados de relajación y calma, especialmente durante la transición al sueño o relajación con los ojos cerrados.</li>
+<li>En EMG: El rango alfa no tiene una correlación directa con relajación (como en EEG). Sin embargo, puede reflejar actividad muscular en frecuencias bajas, especialmente durante movimientos lentos o tensiones isométricas.</li>
+<li>En EOG: El rango alfa puede reflejar actividad asociada con movimientos lentos del ojo durante la transición al sueño.</li>
+
+3. at (Relación alfa-theta)
+
+Cociente entre la potencia de las ondas alfa y theta.
+<li>En EEG: Este índice puede usarse para determinar el grado de relajación o alerta.</li>
+<li>En EMG: Se puede usar para comparar actividad de baja frecuencia entre músculos en reposo versus en movimiento.</li>
+<li>En EOG: Indica la relación entre movimientos oculares lentos y más rápidos. Puede usarse para diferenciar estados de sueño (por ejemplo, transición al REM).</li>
+
+4. beta (Potencia en el rango beta)
+
+Representa la potencia en el rango beta (13-30 Hz).
+<li>En EEG: Estas ondas están asociadas con actividad mental, concentración y, en algunos casos, estrés o ansiedad.</li>
+<li>En EMG: Representa actividad muscular en frecuencias más altas, asociada con movimientos musculares rápidos o contracciones voluntarias.</li>
+<li>En EOG: Potencia en frecuencias más altas, asociada con movimientos oculares rápidos o actividad relacionada con parpadeos.</li>
+
+5. db (Relación delta-beta)
+
+Cociente entre las potencias en el rango delta (0.5-4 Hz) y beta (13-30 Hz).
+<li>En EEG: Un aumento en la relación puede indicar somnolencia o disminución de la actividad cortical.</li>
+<li>En EMG: Una mayor relación delta-beta podría sugerir períodos de descanso muscular, ya que las frecuencias más bajas (delta) dominan en músculos relajados.</li>
+<li>En EOG: Mayor relación indica predominancia de movimientos lentos del ojo, como en etapas tempranas del sueño.</li>
+
+6. ds (Pendiente espectral delta)
+
+<li>En EEG: Analiza la pendiente de la potencia en el rango delta en el dominio de frecuencias, lo que puede reflejar cambios en la profundidad del sueño.</li>
+<li>En EMG: Analiza cómo decae la potencia en el rango delta de la señal muscular. Una pendiente más pronunciada puede indicar menor actividad muscular de baja frecuencia.</li>
+<li>En EOG: Evalúa la pendiente en el rango delta, reflejando la intensidad de movimientos lentos del ojo.</li>
+
+7. dt (Relación delta-theta)
+
+Cociente entre las potencias en los rangos delta (0.5-4 Hz) y theta (4-8 Hz).
+<li>En EEG: Se utiliza para estudiar la arquitectura del sueño, ya que estas frecuencias predominan en las etapas profundas y ligeras del sueño, respectivamente.</li>
+<li>En EMG: Relación entre las frecuencias bajas en reposo y actividad muscular ligera. Es útil para monitorear relajación versus activación.</li>
+<li>En EOG: Cociente entre movimientos oculares lentos y más rápidos, útil para analizar transiciones entre sueño ligero y REM.</li>
+
+8. fdelta (Frecuencia dominante en delta)
+
+Representa la frecuencia dentro del rango delta con mayor potencia.
+<li>En EEG: Es un marcador de sueño profundo (NREM etapa 3).</li>
+<li>En EMG: Indica la frecuencia más representativa en el rango delta de la señal muscular. Un valor alto puede reflejar vibraciones musculares lentas.</li>
+<li>En EOG: Frecuencia más representativa en movimientos lentos del ojo. Una frecuencia alta puede reflejar parpadeos frecuentes.</li>
+
+9. hcomp (Complejidad de Higuchi)
+
+Estima la complejidad de la señal EEG utilizando el algoritmo de Higuchi.
+<li>En EEG: Es útil para analizar fenómenos no lineales en las señales EEG, como la transición entre vigilia y sueño.</li>
+<li>En EMG: Mide la complejidad de la señal muscular. Movimientos complejos o transitorios (como espasmos) aumentan esta medida.</li>
+<li>En EOG: Refleja la complejidad de los movimientos oculares, como transiciones rápidas durante REM.</li>
+
+10. higuchi (Dimensión fractal de Higuchi)
+
+Otra medida de la complejidad basada en la geometría fractal de la señal EEG.
+<li>En EEG: Valores más altos indican mayor desorganización o actividad caótica.</li>
+<li>En EMG: Evalúa la estructura fractal de la señal. Es útil para detectar patrones irregulares en la actividad muscular.</li>
+<li>En EOG: Detecta patrones irregulares en movimientos oculares.</li>
+
+11. hmob (Movilidad de Hjorth)
+
+Mide la tasa de cambio de la amplitud de la señal, reflejando la velocidad de cambio en el EEG.
+<li>En EEG: Está relacionado con la actividad cortical.</li>
+<li>En EMG: Refleja la rapidez con la que cambia la señal de EMG, asociada con contracciones musculares rápidas o sostenidas.</li>
+<li>En EOG: Mide la rapidez de cambio en los movimientos oculares.</li>
+
+12. iqr (Rango intercuartílico)
+
+Mide la dispersión de la amplitud de la señal entre el percentil 25 y el 75.
+<li>En EEG: Ayuda a eliminar el efecto de valores atípicos en el análisis de amplitud.</li>
+<li>En EMG: Analiza la variación central de la señal de EMG, eliminando valores extremos que podrían ser artefactos o picos.</li>
+<li>En EOG: Variabilidad en la amplitud de la señal ocular, eliminando valores extremos (parpadeos).</li>
+
+13. kurt (Curtosis)
+
+Mide la forma de la distribución de la amplitud de la señal.
+<li>En EEG: Una curtosis elevada indica la presencia de picos o eventos raros de alta amplitud.</li>
+<li>En EMG: Identifica eventos extremos en la señal, como movimientos bruscos o contracciones repentinas.</li>
+<li>En EOG: Identifica movimientos oculares extremos, como REM intenso.</li>
+
+14. nzc (Cruces por cero)
+
+Cuenta el número de veces que la señal cruza el eje cero en un intervalo.
+<li>En EEG: Se relaciona con la frecuencia dominante de la señal.</li>
+<li>En EMG: Refleja la frecuencia de oscilaciones musculares, útil para analizar patrones repetitivos como temblores.</li>
+<li>En EOG: Refleja la frecuencia de oscilaciones en los movimientos oculares. Útil para identificar patrones como REM.</li>
+
+15. perm (Entropía de permutación)
+
+Mide la complejidad de la señal basada en la probabilidad de ocurrencia de patrones específicos en el tiempo.
+<li>En EEG: Se usa para caracterizar la desorganización de las señales EEG.</li>
+<li>En EMG: Mide la aleatoriedad de la señal muscular. Una mayor entropía indica actividad más desorganizada, como en espasmos o movimientos bruscos.</li>
+<li>En EOG: Mide la aleatoriedad de los movimientos oculares.</li>
+
+16. petrosian (Dimensión fractal de Petrosian)
+
+Una medida de la complejidad de la señal basada en cambios abruptos en la dirección del EEG.
+<li>En EEG: Útil para detectar eventos episódicos o transitorios.</li>
+<li>En EMG: Detecta cambios abruptos en la señal, característicos de movimientos rápidos o actividad muscular transitoria.</li>
+<li>En EOG: Detecta cambios abruptos en la dirección de los movimientos oculares.</li>
+
+17. sdelta (Potencia relativa delta)
+
+Representa la proporción de la potencia en el rango delta respecto a la potencia total de la señal.
+<li>En EEG: Se usa para evaluar la calidad del sueño profundo.</li>
+<li>En EMG: Puede reflejar relajación muscular.</li>
+<li>En EOG: Proporción de movimientos oculares lentos respecto al total.</li>
+
+18. sigma (Potencia en el rango sigma)
+
+Potencia en el rango sigma (12-16 Hz), a menudo asociado con los husos del sueño (spindles).
+<li>En EEG: Los husos son importantes para consolidar la memoria durante el sueño.</li>
+<li>En EMG: Asociada con actividad muscular moderada, como movimientos rítmicos.</li>
+<li>En EOG: Asociada con movimientos rítmicos o transitorios en frecuencias medias.</li>
+
+19. skew (Asimetría o sesgo)
+
+Indica el sesgo en la distribución de la amplitud de la señal.
+<li>En EEG: Valores positivos o negativos indican si la señal está más cargada hacia valores altos o bajos.</li>
+<li>En EMG: Una asimetría elevada puede reflejar contracciones musculares irregulares.</li>
+<li>En EOG: Refleja la dirección predominante de los movimientos oculares.</li>
+
+20. std (Desviación estándar)
+
+Refleja la variabilidad de la amplitud de la señal en un intervalo.
+<li>En EEG: Valores más altos indican mayor amplitud promedio.</li>
+<li>En EMG: Una alta desviación indica contracciones intensas.</li>
+<li>En EOG: Variabilidad en la amplitud de los movimientos oculares.</li>
+
+21. theta (Potencia en el rango theta)
+
+Mide la potencia en el rango theta (4-8 Hz).
+<li>En EEG: Asociada con la transición al sueño ligero y actividades relacionadas con el descanso y la relajación.</li>
+<li>En EMG: Actividad muscular en el rango theta, que puede aparecer en movimientos lentos o relajación muscular.</li>
+<li>En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.</li>
+
+Además, el algoritmo calcula versiones suavizadas y normalizadas de estas características. Específicamente, se aplica un promedio móvil triangular ponderado centrado de 7.5 minutos y un promedio móvil de 2 minutos hacia atrás. Las características suavizadas resultantes se normalizan utilizando un **z-score** robusto.
+
+## 4.3 Extracción de características
+
+```{python}
+def load_features(raw_list, labels_list):
+    
+    sls_pd = pd.DataFrame()
+
+    paciente = 1
+
+    for (raw, labels) in zip(raw_list, labels_list):
+
+        # Obtain features using SleepStaging
+        sls = yasa.SleepStaging(raw, eeg_name ='C4-A1', eog_name='LOC-A2', emg_name='X1')
+
+        # Eliminamos las 30 epochs (each 30s)
+        sls2 = sls.get_features()[:-30]
+        sls2["paciente"] = paciente
+        sls2["y"] = labels
+
+        sls_pd = pd.concat([sls_pd,sls2])
+
+        paciente += 1
+    
+    return sls_pd
+
+sls_pd = load_features(raw_train_list, labels_train_list)
+```
+
+```{python}
+sls_pd.describe()
+```
+
+### 4.3.1 Análisis Exploratorio
+
+1. Seleccionamos las variables no normalizadas
+
+```{python}
+sls_pd = sls_pd.loc[:, ~sls_pd.columns.str.contains("norm")]
+sls_pd
+```
+
+2. Creación de un reporte .html sobre las variables a utilizar.
+
+```{python}
+# Generate automated report and save it to HTML (comentado debido a su gran coste computacional)
+# profile = ProfileReport(sls_pd, title="Sleep Stage Data")
+# profile.to_file("eda.html")
+```
+
+3. Dividir el conjunto de datos en Entrenamiento y Validación. Binarizar la variable objetivo.
+
+```{python}
+# Create a mapping for sleep stages
+sleep_stages = {
+    0: 'Wake',
+    1: 'N1 sleep',
+    2: 'N2 sleep',
+    3: 'N3 sleep',
+    4: 'REM sleep'
+}
+
+# Train y Validation
+Xtrain = sls_pd[sls_pd["paciente"] <= 6].iloc[:,:-3].copy()
+
+ytrain = sls_pd[sls_pd["paciente"] <= 6].loc[:,"y"].copy()
+
+Xval= sls_pd[sls_pd["paciente"] >= 7].iloc[:,:-3].copy()
+yval = sls_pd[sls_pd["paciente"] >= 7].loc[:,"y"].copy()
+
+# Binarize the output
+ytrain_bin = label_binarize(ytrain, classes=list(sleep_stages.keys()))
+yval_bin = label_binarize(yval, classes=list(sleep_stages.keys()))
+```
+
+### 4.3.2 Visualización
+
+Cambiamos los números de la variable objetivo por los nombres de las etapas correspondientes.
+
+```{python}
+sleep_stages = {
+    0: 'Wake',
+    1: 'N1',
+    2: 'N2',
+    3: 'N3',
+    4: 'REM'
+}
+
+sls_pd_tidy = sls_pd.drop(["time_hour"], axis=1)
+sls_pd_tidy["y"] = sls_pd_tidy["y"].map(sleep_stages)
+sls_pd_tidy
+```
+
+Hacemos el data frame tidy para poder realizar gráficos exploratorios.
+
+```{python}
+sls_pd_tidy = sls_pd_tidy.melt(id_vars = ["paciente","y"], value_vars = sls_pd_tidy.columns[:-2])
+sls_pd_tidy
+```
+
+Realizamos un boxplot para las variables `eeg_abspow` y `eog_skew` para ver las diferencias que muestran en cada fase del sueño. Este gráfico, entre otros, se mostrará en el dashboard final al que tendrá acceso el médico.
+
+```{python}
+g = sns.catplot(data=sls_pd_tidy[sls_pd_tidy["variable"].isin(["eeg_abspow","eog_skew"])], y="value", hue="y", col="variable", kind = "box", sharey=False)
+# Eliminar la leyenda automática
+g._legend.remove()
+# Agregar la leyenda personalizada
+plt.legend(ncol=5, loc="lower center", bbox_to_anchor=(0, -0.1))
+plt.show()
+```
+
+Para la variable `eeg_abspow` observamos cómo obtiene valores más altos y mucha mayor varianza para las fases `Wake` y `N3`, mientras que para las otras muestra valores relativamente similares y una menor varianza.
+
+Para la variable `eog_skew` los valores son muy similares para todas las fases del sueño. La diferencia radica en la varianza en cada fase. Se puede observar cómo para la fase `N3` la varianza es notablemente menor que en las demás, mientras que en las fase `REM` y, en menor medida, en la fase `Wake` observamos una varianza muy elevada.
+
+Ahora realizamos una matriz de correlación que muestra las correlaciones que tienen las variables del dataset entre sí.
+
+```{python}
+plt.imshow(np.corrcoef(Xtrain, rowvar = False), cmap ="viridis")
+plt.show()
+```
+
+Aparte de la obvia correlación máxima que tiene cada variable consigo misma (diagonal principal), observamos varios grupos de variables con correlaciones muy altas, como se puede observar en los cuadrados amarillos (correlación positiva) y los morados (correlación negativa).
+
+# 5. Modelado
+
+## 5.1 Algoritmo `XGBoost` para Clasificación de Etapas del Sueño
+
+XGBoost es una implementación específica de **Random Forest** con **gradient boosting**, que incluye diversas optimizaciones para mejorar el rendimiento y la precisión. Sus ventajas principales incluyen:
+
+- **Regularización:** Incorpora términos de regularización L1 (Lasso) y L2 (Ridge) para prevenir el sobreajuste, algo que no está presente en la implementación de `GradientBoosting` de `scikit-learn`.  
+- **Manejo de valores faltantes:** XGBoost tiene capacidad integrada para manejar datos faltantes, a diferencia de la implementación de `scikit-learn`.  
+- **Paralelización:** Está diseñado para trabajar de manera eficiente en sistemas paralelos y distribuidos, lo que lo hace mucho más rápido que el Boosting estándar de `scikit-learn`.  
+- **Poda de árboles:** Utiliza una técnica llamada "poda de profundidad máxima" (*max depth pruning*), que detiene el crecimiento de los árboles cuando ya no aportan valor.  
+
+Este enfoque combina velocidad, robustez y flexibilidad, haciéndolo ideal para tareas complejas como la clasificación de etapas del sueño.
+
+### 5.1.1 Interpretabilidad
+
+Para mejorar la interpretabilidad del modelo, se empleará un XGBoost para cada estado de sueño. De este modo, se obtendrá de forma más precisa qué características ha utilizado cada modelo para realizar la predicción.
+Además, para cada modelo se ha realizado también una version `surrogate` mediante un árbol de decisión. Este modelo es menos potente que el XGBoost, pero ayuda a la interpretabilidad.
+
+Cabe destacar que se ha realizado un grid search exhaustivo para cada modelo, pero se ha comentado debido a su gran coste computacional. Los parámetros elegidos para cada modelo son aquellos obtenidos mediante el grid search. Se han probado un total de 6 parámetros diferentes, con 3 posibles valores para cada uno:
+<li>learning_rate: Se trata de la velocidad a la que aprende el modelo. Un valor más alto indica una velocidad de aprendizaje mayor. No es recomendable que su valor sea excesivamente alto por el riesgo de <i>overfitting</i></li>
+<li>max_depth: Profundidad máxima que puede tener cada árbol. Una profundidad demasiado elevada puede crear <i>overfitting</i>, pero una demasiado baja puede no captar todas las características de los datos.</li>
+<li>min_child_weight: Es la suma mínima de los pesos de las instancias requeridos para dividir un nodo. Nodos con menor valor del peso establecido no serán divididos.</li>
+<li>n_estimators: Representa el número de árboles que serán entrenados en el modelo. Un número mayor de árboles puede captar más detalles, pero existe el riesgo de <i>overfitting</i>.</li>
+<li>reg_alpha: Controla la regularización L1, que penaliza las características menos relevantes al reducir los pesos asociados.</li>
+<li>reg_lambda: Controla la regularización L2, que penaliza los pesos grandes para evitar que el modelo dependa demasiado de características individuales.</li>
+
+Primero creamos dos funciones que nos ayudarán a interpretar los resultados:
+
+<li>show_features: Muestra las 20 variables más importantes para el modelo en orden descendente en base a su <i>cover</i> (número de veces que se utiliza la variable para hacer divisiones en los árboles) y su <i>gain</i> (mejora o reducción del error media de la variable cuando se utiliza para dividir).</li>
+<li>show_metricas: Muestra un total de 8 métricas para analizar los resultados del modelo.</li>
+
+```{python}
+def show_features(model, max_num_features=20):
+    fig, axes = plt.subplots(1, 2, sharex=False, sharey=False, figsize = (20,5))
+    contx = 0
+
+    for type in ["cover","gain"]:
+        xgb.plot_importance(model, importance_type=type, max_num_features=max_num_features, ax=axes[contx],values_format="{v:.2f}")
+        axes[contx].set_title(type)
+        axes[contx].set_ylabel("")
+        contx += 1
+    fig.suptitle("Feature Importance")
+    fig.supylabel("Features")
+    plt.show()
+    return
+
+def show_metricas(n_modelo,y_true, y_pred,multi=False):
+    
+    if multi:
+        modo = "weighted"
+        auc = None
+        esp = None
+    else:
+        modo = "binary"
+        auc = metrics.roc_auc_score(y_true, y_pred)
+        esp = metrics.recall_score(y_true, y_pred, pos_label=0)
+
+    metricas = {"Modelo":n_modelo,
+                "Accuracy":metrics.accuracy_score(y_true, y_pred),
+                "Precision":metrics.precision_score(y_true, y_pred, average=modo),
+                "AP":metrics.average_precision_score(y_true, y_pred),
+                "AUC":auc,
+                "Sensibilidad":metrics.recall_score(y_true, y_pred, average=modo),
+                "Especificidad":esp,
+                "F-Score":metrics.f1_score(y_true,y_pred,average=modo)}
+    return metricas
+
+modelos = []
+metricas = []
+```
+
+## 5.2 Modelo Wake
+
+### 5.2.1 Creación del modelo
+
+Primero realizamos el modelo `Wake`, que distinguirá cuándo el paciente está despierto (Wake) o dormido.
+
+Los parámetros elegidos por el grid search son:
+<li>learning_rate = 0.4</li>
+<li>max_depth = 5</li>
+<li>min_child_weight = 1.0</li>
+<li>n_estimators = 1000</li>
+<li>reg_alpha = 0.5</li>
+<li>reg_lambda = 3</li>
+
+```{python}
+modelWake = xgb.XGBClassifier(learning_rate=0.4, 
+                              max_depth=5, 
+                              min_child_weight=1.0, 
+                              n_estimators=1000, 
+                              reg_alpha=0.5, 
+                              reg_lambda=3)
+"""
+param_grid = {
+    'n_estimators': [1000, 3000, 5000],
+    'max_depth': [4, 5, 6],
+    'learning_rate': [0.1, 0.3, 0.4],
+    'min_child_weight': [1.0, 1.5, 5],
+    'reg_alpha': [0, 0.1, 0.5],
+    'reg_lambda': [1, 2, 3]
+}
+
+grid_search = GridSearchCV(
+    estimator=modelWake,
+    param_grid=param_grid,
+    scoring='accuracy',
+    cv=3,
+    verbose=1,
+    n_jobs=-1
+)
+
+grid_search.fit(Xtrain,ytrain_bin[:,0])
+
+print("Best Parameters:", grid_search.best_params_)
+print("Best Cross-Validation Accuracy:", grid_search.best_score_)
+
+modelWake = grid_search.best_estimator_
+"""
+modelWake.fit(Xtrain,ytrain_bin[:,0])
+```
+
+### 5.2.2 Selección de características
+
+Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.
+
+```{python}
+explainer = shap.TreeExplainer(modelWake)
+shap_values_Wake = explainer.shap_values(Xtrain)
+shap_values_Wake.shape
+```
+
+```{python}
+shap.summary_plot(shap_values_Wake, Xtrain, show=False)
+```
+
+Obtenemos que `eeg_fdelta`, `eeg_higuchi` y `eeg_at` son las variables más importantes para el modelo Wake.
+
+Estas variables afectan al modelo de la siguiente manera, interpretando el resultado obtenido:
+<li>eeg_fdelta: Los valores más altos de esta variable afectan negativamente, es decir, si se tiene un valor de eeg_fdelta alto, la predicción del modelo será que el paciente está dormido.</li>
+<li>eeg_higuchi: Al contrario que en el caso anterior, los valores más altos significarán que el paciente está despierto, y los más bajos, que está durmiendo.</li>
+<li>eeg_at: Al igual que en la variable eeg_higuchi, pero de manera menos clara, los valores más altos de esta variable indicarán que el paciente está despierto.</li>
+
+Ahora mostramos por pantalla las variables más importantes para el modelo y observamos si coinciden.
+
+```{python}
+show_features(modelWake)
+```
+
+Observamos que entre las variables más importantes y, por tanto, las que mejor explican este modelo están `eeg_higuchi` y `eeg_fdelta`, al igual que con Shap. Sin embargo, vemos cómo `eeg_at` no es considerada tan importante y, en su lugar, `emg_std` sí que lo es.
+
+### 5.2.3 Uso de `Surrogate model` para la interpretabilidad
+
+```{python}
+surrogateWake_labels = modelWake.predict(Xtrain)
+surrogateWake_model = DecisionTreeClassifier(random_state=42, max_depth=5)
+surrogateWake_model.fit(Xtrain,surrogateWake_labels)
+
+plt.figure(figsize=(20,10))
+plot_tree(surrogateWake_model, filled=True, feature_names=Xtrain.columns, class_names=["Sleep","Wake"])
+plt.show()
+```
+
+### 5.2.4 Métricas
+
+```{python}
+metricas_Wake = show_metricas("Wake",yval_bin[:,0],modelWake.predict(Xval))
+metricas.append(metricas_Wake)
+metricas_Wake
+```
+
+El modelo obtenido ofrece unas métricas muy buenas, todas ellas por encima de 0.9, con una gran sensibilidad y especificidad.
+
+```{python}
+modelos.append(modelWake)
+```
+
+## 5.3 Modelo N1
+
+### 5.3.1 Creación del modelo
+
+Ahora realizamos un modelo para la fase N1 o etapa I del sueño. Esta etapa tiene menos características que la hagan única, así que será más complicado predecirla correctamente.
+
+Los parámetros obtenidos en el grid search son:
+<li>learning_rate = 0.4</li>
+<li>max_depth = 6</li>
+<li>min_child_weight = 1.0</li>
+<li>n_estimators = 1000</li>
+<li>reg_alpha = 0.5</li>
+<li>reg_lambda = 1</li>
+
+```{python}
+modelN1 = xgb.XGBClassifier(learning_rate=0.4, 
+                            max_depth=6, 
+                            min_child_weight=1.0, 
+                            n_estimators=1000, 
+                            reg_alpha=0.5, 
+                            reg_lambda=1)
+"""
+param_grid = {
+    'n_estimators': [1000, 3000, 5000],
+    'max_depth': [4, 5, 6],
+    'learning_rate': [0.1, 0.3, 0.4],
+    'min_child_weight': [1.0, 1.5, 5],
+    'reg_alpha': [0, 0.1, 0.5],
+    'reg_lambda': [1, 2, 3]
+}
+
+grid_search = GridSearchCV(
+    estimator=modelN1,
+    param_grid=param_grid,
+    scoring='accuracy',
+    cv=3,
+    verbose=1,
+    n_jobs=-1
+)
+
+grid_search.fit(Xtrain,ytrain_bin[:,1])
+
+print("Best Parameters:", grid_search.best_params_)
+print("Best Cross-Validation Accuracy:", grid_search.best_score_)
+
+modelN1 = grid_search.best_estimator_
+"""
+modelN1.fit(Xtrain,ytrain_bin[:,1])
+```
+
+### 5.3.2 Selección de características
+
+Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.
+
+```{python}
+explainer = shap.TreeExplainer(modelN1)
+shap_values_N1 = explainer.shap_values(Xtrain)
+shap_values_N1.shape
+```
+
+```{python}
+shap.summary_plot(shap_values_N1, Xtrain, show=False)
+```
+
+Obtenemos que `eeg_beta`, `eeg_abspow` y `eeg_iqr` son las variables más importantes para el modelo N1.
+
+Estas variables afectan al modelo de la siguiente manera, interpretando el resultado obtenido:
+<li>eeg_beta: Los valores más bajos de esta variable afectan negativamente, es decir, si se tiene un valor de eeg_beta bajo, la predicción del modelo será que el paciente no está en la fase N1, y si el valor es alto, entonces sí que lo estará.</li>
+<li>eeg_abspow: Al contrario que en el caso anterior, aunque con muchas más excepciones, los valores más bajos significarán que el paciente está en la fase N1, y los más bajos, que no lo está.</li>
+<li>eeg_iqr: Al igual que en la variable eeg_abspow, y con menos excpeciones en los valores extremos, los valores más bajos de esta variable indicarán que el paciente está en la fase N1.</li>
+
+Ahora mostramos las variables más importantes para el modelo y observamos si coinciden con el resultado obtenido en Shap.
+
+```{python}
+show_features(modelN1)
+```
+
+Obtenemos muchas variables con importancia similar en el modelo. Las más importantes es `eeg_abspow`, con mucho gain, y `eeg_beta`, con mucho cover, que ya habían aparecido en Shap. Sin embargo, la variable `eeg_iqr` no es considerada tan importante en este caso, y tenemos otras variables como `emg_hmob`, con mucho cover, y `eeg_theta`, con mucho gain en su lugar.
+
+### 5.3.3 Uso de `Surrogate model` para la interpretabilidad
+
+```{python}
+surrogateN1_labels = modelN1.predict(Xtrain)
+surrogateN1_model = DecisionTreeClassifier(random_state=42, max_depth=5)
+surrogateN1_model.fit(Xtrain,surrogateN1_labels)
+
+plt.figure(figsize=(20,10))
+plot_tree(surrogateN1_model, filled=True, feature_names=Xtrain.columns, class_names=["No N1","N1"])
+plt.show()
+```
+
+### 5.3.4 Métricas
+
+```{python}
+metricas_N1 = show_metricas("N1",yval_bin[:,1],modelN1.predict_proba(Xval)[:,1]>0.3)
+metricas.append(metricas_N1)
+metricas_N1
+```
+
+Tal y como suponíamos, es bastante complicado obtener grandes resultados para esta etapa. Pese a tener un muy buen accuracy y especificidad, sus valores para el AP y la sensibilidad son muy bajos. Por lo tanto, se puede concluir que el rendimiento de este modelo es bastante inferior al del modelo anterior.
+
+```{python}
+modelos.append(modelN1)
+```
+
+## 5.4 Modelo N2
+
+### 5.4.1 Creación del modelo
+
+Ahora realizamos un modelo para la fase N2 o etapa II del sueño. Esta etapa es más reconocible que la I, pero sigue teniendo pocas características únicas.
+
+Los parámetros obtenidos en el grid search son:
+<li>learning_rate = 0.3</li>
+<li>max_depth = 5</li>
+<li>min_child_weight = 1.5</li>
+<li>n_estimators = 5000</li>
+<li>reg_alpha = 0</li>
+<li>reg_lambda = 3</li>
+
+```{python}
+modelN2 = xgb.XGBClassifier(learning_rate=0.3, 
+                            max_depth=5, 
+                            min_child_weight=1.5, 
+                            n_estimators=5000, 
+                            reg_alpha=0, 
+                            reg_lambda=3)
+"""
+param_grid = {
+    'n_estimators': [1000, 3000, 5000],
+    'max_depth': [4, 5, 6],
+    'learning_rate': [0.1, 0.3, 0.4],
+    'min_child_weight': [1.0, 1.5, 5],
+    'reg_alpha': [0, 0.1, 0.5],
+    'reg_lambda': [1, 2, 3]
+}
+
+grid_search = GridSearchCV(
+    estimator=modelN2,
+    param_grid=param_grid,
+    scoring='accuracy',
+    cv=3,
+    verbose=1,
+    n_jobs=-1
+)
+
+grid_search.fit(Xtrain,ytrain_bin[:,2])
+
+print("Best Parameters:", grid_search.best_params_)
+print("Best Cross-Validation Accuracy:", grid_search.best_score_)
+
+modelN2 = grid_search.best_estimator_
+"""
+modelN2.fit(Xtrain,ytrain_bin[:,2])
+```
+
+### 5.4.2 Selección de características
+
+Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.
+
+```{python}
+explainer = shap.TreeExplainer(modelN2)
+shap_values_N2 = explainer.shap_values(Xtrain)
+shap_values_N2.shape
+```
+
+```{python}
+shap.summary_plot(shap_values_N2, Xtrain, show=False)
+```
+
+Obtenemos que `eeg_abspow`, `eeg_kurt` y `eeg_fdelta` son las variables más importantes para el modelo N2.
+
+Estas variables afectan al modelo de la siguiente manera, interpretando el resultado obtenido:
+<li>eeg_abspow: Los valores más altos de esta variable afectan positivamente, es decir, si se tiene un valor de eeg_abspow alto, la predicción del modelo será que el paciente está en la fase N2.</li>
+<li>eeg_kurt: De la misma manera que en el caso anterior, los valores más altos significarán que el paciente está en la fase N2, y los más bajos, que no lo está.</li>
+<li>eeg_fdelta: Al igual que en las variables anteriores, pero con mayor claridad en los valores extremos, los valores más altos de esta variable indicarán que el paciente está en la fase N2.</li>
+
+Ahora mostramos las variables más importantes para el modelo y observamos si coinciden con el resultado obtenido en Shap.
+
+```{python}
+show_features(modelN2)
+```
+
+Por primera vez obtenemos variables completamente distintas en Shap y en cover y gain. Pese a que este modelo tiene bastantes de importancia similar, ninguna de las principales es `eeg_abspow`, `eeg_kurt` o `eeg_fdelta`. Las que más gain producen son `eeg_db`, `eog_theta`, `eog_iqr` y `eeg_std`, y las que más cover producen son `eeg_db`, `eog_alpha` y `eog_std`.
+
+### 5.4.3 Uso de `Surrogate model` para la interpretabilidad
+
+```{python}
+surrogateN2_labels = modelN2.predict(Xtrain)
+surrogateN2_model = DecisionTreeClassifier(random_state=42, max_depth=6)
+surrogateN2_model.fit(Xtrain,surrogateN2_labels)
+
+plt.figure(figsize=(20,10))
+plot_tree(surrogateN2_model, filled=True, feature_names=Xtrain.columns, class_names=["No N2","N2"])
+plt.show()
+```
+
+### 5.4.4 Métricas
+
+```{python}
+metricas_N2 = show_metricas("N2",yval_bin[:,2],modelN2.predict(Xval))
+metricas.append(metricas_N2)
+metricas_N2
+```
+
+El resultado obtenido es bastante decente. Pese a tener una precisión bastante baja, su accuracy, su sensibilidad y su especificidad son bastante buenos (>0.8), por lo tanto se puede concluir que se trata de un modelo bastante bueno.
+
+```{python}
+modelos.append(modelN2)
+```
+
+## 5.5 Modelo N3
+
+### 5.5.1 Creación del modelo
+
+El siguiente modelo tratará de predecir la fase N3 o <i>slow wave</i>, bastante reconocible debido a la gran amplitud que muestran los distintos valores medidos.
+
+Los parámetros obtenidos en el grid search son:
+<li>learning_rate = 0.4</li>
+<li>max_depth = 6</li>
+<li>min_child_weight = 1.0</li>
+<li>n_estimators = 1000</li>
+<li>reg_alpha = 0.5</li>
+<li>reg_lambda = 1</li>
+
+```{python}
+modelN3 = xgb.XGBClassifier(learning_rate=0.4, 
+                            max_depth=6, 
+                            min_child_weight=1.0, 
+                            n_estimators=1000, 
+                            reg_alpha=0.5, 
+                            reg_lambda=1)
+"""
+param_grid = {
+    'n_estimators': [1000, 3000, 5000],
+    'max_depth': [4, 5, 6],
+    'learning_rate': [0.1, 0.3, 0.4],
+    'min_child_weight': [1.0, 1.5, 5],
+    'reg_alpha': [0, 0.1, 0.5],
+    'reg_lambda': [1, 2, 3]
+}
+
+grid_search = GridSearchCV(
+    estimator=modelN3,
+    param_grid=param_grid,
+    scoring='accuracy',
+    cv=3,
+    verbose=1,
+    n_jobs=-1
+)
+
+grid_search.fit(Xtrain,ytrain_bin[:,3])
+
+print("Best Parameters:", grid_search.best_params_)
+print("Best Cross-Validation Accuracy:", grid_search.best_score_)
+modelN3 = grid_search.best_estimator_
+"""
+modelN3.fit(Xtrain,ytrain_bin[:,3])
+```
+
+### 5.5.2 Selección de características
+
+Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.
+
+```{python}
+explainer = shap.TreeExplainer(modelN3)
+shap_values_N3 = explainer.shap_values(Xtrain)
+shap_values_N3.shape
+```
+
+```{python}
+shap.summary_plot(shap_values_N3, Xtrain, show=False)
+```
+
+Obtenemos que `eeg_db`, `eeg_iqr` y `eog_higuchi` son las variables más importantes para el modelo N3.
+
+Estas variables afectan al modelo de la siguiente manera, interpretando el resultado obtenido:
+<li>eeg_db: Los valores más bajos de esta variable afectan negativamente de manera bastante clara, es decir, si se tiene un valor de eeg_db bajo, la predicción del modelo será que el paciente no está en la fase N3, mientras que si el valor es muy alto, significará que sí que lo está.</li>
+<li>eeg_iqr: Al igual que en el caso anterior, los valores más altos significarán que el paciente está en la fase N3, y los más bajos, que no lo está.</li>
+<li>eog_higuchi: Al contrario que en las variables anteriores, los valores más altos de esta variable indicarán que el paciente no está en la fase N3, y lo más altos, que sí.</li>
+
+Ahora mostramos las variables más importantes para el modelo y observamos si coinciden con el resultado obtenido en Shap.
+
+```{python}
+show_features(modelN3)
+```
+
+Con mucha diferencia, la variable más importante para este modelo es `eeg_db`, que coincide con el resultado obtenido en Shap, aunque también es bastante importante `eog_petrosian`, la cual aparece bastante más abajo en Shap, pero con una larga cola que indica que los valores más bajos están en la fase N3. La siguiente más importante es, al igual que en Shap, `eeg_iqr`.
+
+### 5.5.3 Uso de `Surrogate model` para la interpretabilidad
+
+```{python}
+surrogateN3_labels = modelN3.predict(Xtrain)
+surrogateN3_model = DecisionTreeClassifier(random_state=42, max_depth=6)
+surrogateN3_model.fit(Xtrain,surrogateN3_labels)
+
+plt.figure(figsize=(20,10))
+plot_tree(surrogateN3_model, filled=True, feature_names=Xtrain.columns, class_names=["No N3","N3"])
+plt.show()
+```
+
+### 5.5.4 Métricas
+
+```{python}
+metricas_N3 = show_metricas("N3",yval_bin[:,3],modelN3.predict(Xval))
+metricas.append(metricas_N3)
+metricas_N3
+```
+
+Los valores obtenidos en las métricas son muy buenos, con un accuracy, una sensibilidad y una especificidad de más de 0.9, podemos afirmar que el modelo en cuestión obtiene unos resultados muy buenos.
+
+```{python}
+modelos.append(modelN3)
+```
+
+## 5.6 Modelo REM
+
+### 5.6.1 Creación del modelo
+
+Por último, realizamos el modelo para la fase REM (Rapid-eye movement), que como su nombre indica, tiene como característica principal el movimiento rápido de los ojos.
+
+Los parámetros obtenidos en el grid search son:
+<li>learning_rate = 0.4</li>
+<li>max_depth = 5</li>
+<li>min_child_weight = 1.5</li>
+<li>n_estimators = 1000</li>
+<li>reg_alpha = 0.5</li>
+<li>reg_lambda = 2</li>
+
+```{python}
+modelREM = xgb.XGBClassifier(learning_rate=0.4, 
+                             max_depth=5, 
+                             min_child_weight=1.5, 
+                             n_estimators=1000, 
+                             reg_alpha=0.5, 
+                             reg_lambda=2)
+"""
+param_grid = {
+    'n_estimators': [1000, 3000, 5000],
+    'max_depth': [4, 5, 6],
+    'learning_rate': [0.1, 0.3, 0.4],
+    'min_child_weight': [1.0, 1.5, 5],
+    'reg_alpha': [0, 0.1, 0.5],
+    'reg_lambda': [1, 2, 3]
+}
+
+grid_search = GridSearchCV(
+    estimator=modelREM,
+    param_grid=param_grid,
+    scoring='accuracy',
+    cv=3,
+    verbose=1,
+    n_jobs=-1
+)
+
+grid_search.fit(Xtrain,ytrain_bin[:,4])
+
+print("Best Parameters:", grid_search.best_params_)
+print("Best Cross-Validation Accuracy:", grid_search.best_score_)
+
+modelREM = grid_search.best_estimator_
+"""
+modelREM.fit(Xtrain,ytrain_bin[:,4])
+```
+
+### 5.6.2 Selección de características
+
+Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.
+
+```{python}
+explainer = shap.TreeExplainer(modelREM)
+shap_values_REM = explainer.shap_values(Xtrain)
+shap_values_REM.shape
+```
+
+```{python}
+shap.summary_plot(shap_values_REM, Xtrain, show=False)
+```
+
+Obtenemos que `eeg_abspow`, `emg_nzc` y `emg_iqr` son las variables más importantes para el modelo REM.
+
+Estas variables afectan al modelo de la siguiente manera, interpretando el resultado obtenido:
+<li>eeg_abspow: Los valores más altos de esta variable afectan negativamente, es decir, si se tiene un valor de eeg_abspow alto, la predicción del modelo será que el paciente no está en la fase REM.</li>
+<li>emg_nzc: Al igual que en el caso anterior, y aparentemente de manera bastante más clara, los valores más altos significarán que el paciente no está en la fase REM, y los más bajos, que sí lo está.</li>
+<li>emg_iqr: Al igual que en las variables anteriores, pero de manera menos clara salvo para los valores muy elevados, los valores más altos de esta variable indicarán que el paciente no está en la fase REM.</li>
+
+Ahora mostramos las variables más importantes para el modelo y observamos si coinciden con el resultado obtenido en Shap.
+
+```{python}
+show_features(modelREM)
+```
+
+Obtenemos que `emg_nzc` y `eeg_abspow`, al igual que en Shap, son variables muy importantes para el modelo. Sin embargo, la variable `emg_iqr` ahora no aparece entre las más importantes, ocupando su lugar `eog_hcomp`.
+
+### 5.6.3 Uso de `Surrogate model` para la interpretabilidad
+
+```{python}
+surrogateREM_labels = modelREM.predict(Xtrain)
+surrogateREM_model = DecisionTreeClassifier(random_state=42, max_depth=6)
+surrogateREM_model.fit(Xtrain,surrogateREM_labels)
+
+plt.figure(figsize=(20,10))
+plot_tree(surrogateREM_model, filled=True, feature_names=Xtrain.columns, class_names=["No REM","REM"])
+plt.show()
+```
+
+### 5.6.4 Métricas
+
+```{python}
+metricas_REM = show_metricas("REM",yval_bin[:,4],modelREM.predict(Xval))
+metricas.append(metricas_REM)
+metricas_REM
+```
+
+Obtenemos una especificidad excelente, así como grandes resultados en accuracy y precisión. Su principal debilidad es una sensibilidad bastante baja, por lo que se trata de un modelo bueno, pero no ideal.
+
+```{python}
+modelos.append(modelREM)
+```
+
+## 5.7 Modelo Global
+
+### 5.7.1 Creación del modelo
+
+```{python}
+def predict_model_XGBoost(modelos, X):
+    predicciones = modelos[0].predict(X)
+    for col in range(1,5):
+        if col == 1:
+            predicciones = np.column_stack((predicciones,modelos[col].predict_proba(X)[:,1]>0.3))
+        else:
+            predicciones = np.column_stack((predicciones,modelos[col].predict(X)))
+    return predicciones
+```
+
+### 5.7.2 Métricas
+
+Ahora utilizaremos el conjunto de validación separado anteriormente para observar los resultados con un conjunto nuevo de datos antes de hacerlo con el test.
+
+```{python}
+pred_global = predict_model_XGBoost(modelos,Xval)
+metricas_global = show_metricas("Global", yval_bin, pred_global, True)
+metricas.append(metricas_global)
+metricas_global
+```
+
+Creamos una matriz de confusión que nos ayuden a observar la proporción de los valores acertados, así como cuál ha sido la predicción cuando no ha acertado.
+
+```{python}
+def procesar_filas(predicciones):
+    results = []
+    
+    for row in predicciones:
+        if np.sum(row) >= 1:
+            results.append(np.argmax(row))  # Índice del valor más alto
+        else:
+            results.append(-2)
+            
+    return np.array(results)
+
+clases_pred = [0, 1, 2, 3, 4, -2]
+clases_label_pred = ['Wake', 'N1', 'N2', 'N3', 'REM', '-2']
+clases = ['Wake', 'N1', 'N2', 'N3', 'REM']
+
+yval_idx = np.argmax(yval_bin, axis=1)
+pred_idx = procesar_filas(pred_global)
+
+# Crear una matriz de ceros
+matriz_confusion = np.zeros((len(clases), len(clases_pred)))
+
+for i in range(len(clases)):
+    for j in range(len(clases_pred)):
+        # Calcular la proporción entre clases
+        matriz_confusion[i, j] = np.sum((yval_idx == i) & (pred_idx == clases_pred[j])) / np.sum(yval_idx == i)
+
+confusion_df = pd.DataFrame(matriz_confusion, index=clases, columns=clases_label_pred)
+
+print("Tabla de proporciones:")
+print(confusion_df)
+```
+
+En general, obtenemos unos resultados bastante decentes, puesto que en general obtenemos resultados de 0.75-0.8 en la mayoría de las métricas, lo que indica que los modelos en general son bastante buenos y tienen altas capacidades. Asimismo, destaca como el 25% de los N1 no ha sido capaz de identificarlos y que el 35% lo ha identificado como N2. Por otro lado, la fase REM tampoco ofrece seguridad ya que el 24% lo ha asignado a N2 y el 21% no ha sido capaz de identificarlo. De este modo, se puede concluir que estas son las dos etapas más difíciles de predecir.
+
+```{python}
+metricas = pd.DataFrame(metricas)
+metricas
+```
+
+Observando todos los resultados juntos, vemos cómo el accuracy se ve penalizado al utilizar el conjunto de validación, pero el resto de variables dan aproximadamente el resultado esperado al observar su comportamiento previo.
+
+Ahora creamos una nueva función que nos permite reproducir la curva ROC para cada uno de los modelos en base a sus predicciones.
+
+```{python}
+def observe_results(pred, y):
+
+    for (label,col) in zip(sleep_stages.values(),np.arange(y.shape[1])):
+        fpr, tpr, thresholds = roc_curve(y[:,col], pred[:,col])
+        print("%s AUC: %f" % (label,auc(fpr,tpr)))
+        plt.plot(fpr,tpr, label=label)
+    plt.legend()
+    plt.title("Curva ROC")
+    plt.show()
+```
+
+Primero, observamos los resultados si utilizamos el conjunto de entrenamiento.
+
+```{python}
+observe_results(predict_model_XGBoost(modelos, Xtrain), ytrain_bin)
+```
+
+La curva ROC que obtenemos es perfecta para todos los modelos, lo cual significa que puede predecir los datos del conjunto de entrenamiento a la perfección. Esto en general no se trata de un reflejo de las capacidades del modelo, puesto que estos son los datos con los que ha sido entrenado. A continuación se realizarán pruebas que serán más importantes a la hora de justificar la bondad de los modelos.
+
+Ahora utilizamos el conjunto de validación.
+
+```{python}
+observe_results(predict_model_XGBoost(modelos, Xval.values), yval_bin)
+```
+
+Ahora se observan mejor las capacidades reales de los modelos. Tenemos modelos como `Wake` y `N3` con capacidades muy altas y que son capaces de predecir sus respectivas fases de manera satisfactoria. En cambio, otros modelos como `REM` o, principalmente, `N1` no son capaces de captar sus fases tan bien, y pese a que no ofrecen resultados muy malos, puesto que son capaces de obtener bastante información correctamente, están bastante lejos de llegar a las capacidades de predicción de los modelos con mejores resultados.
+
+# 6. Uso del conjunto de test
+
+Por último, vamos a utilizar el conjunto de test, que será la prueba definitiva para todos nuestros modelos. Dentro de este conjunto tenemos a dos pacientes, los cuales será tratados y analizados de manera independiente.
+
+```{python}
+def comparar_hipnogramas(y_true,y_pred):
+    fig, axes = plt.subplots(1, 2, sharex=False, sharey=False, figsize = (20,5))
+
+    yasa.plot_hypnogram(y_true,ax=axes[0], fill_color="thistle")
+    axes[0].set_title("Original")
+
+    yasa.plot_hypnogram(y_pred,ax=axes[1], fill_color="thistle")
+    axes[1].set_title("Predicción")
+    plt.show()
+    return
+```
+
+Primero, cargamos los datos del conjunto de test y los observamos.
+
+```{python}
+raw_test_list = load_raw(test=True)
+labels_test_list = load_labels(test=True)
+sls_test_pd = load_features(raw_test_list, labels_test_list)
+sls_test_pd = sls_test_pd.loc[:, ~sls_test_pd.columns.str.contains("norm")]
+sls_test_pd
+```
+
+```{python}
+Xtest_1 = sls_test_pd[sls_test_pd["paciente"] == 1].iloc[:,:-3].copy()
+ytest_1 = sls_test_pd[sls_test_pd["paciente"] == 1].loc[:,"y"].copy()
+ytest_bin_1 = label_binarize(ytest_1, classes=list(sleep_stages.keys()))
+```
+
+```{python}
+observe_results(predict_model_XGBoost(modelos, Xtest_1.values), ytest_bin_1)
+```
+
+Los resultados son excelentes, los modelos que tenían peor rendimiento en el conjunto de validación, lo han mejorado sustancialmente en el test del primer paciente. Los modelos con mejor resultado anteriormente han mostrado un rendimiento ligeramente peor, pero siguen obteniendo resultados muy competentes.
+
+Mostramos el hipnograma del primer paciente.
+
+```{python}
+comparar_hipnogramas(ytest_1,procesar_filas(predict_model_XGBoost(modelos, Xtest_1.values)))
+```
+
+```{python}
+Xtest_2 = sls_test_pd[sls_test_pd["paciente"] == 2].iloc[:,:-3].copy()
+ytest_2 = sls_test_pd[sls_test_pd["paciente"] == 2].loc[:,"y"].copy()
+ytest_bin_2 = label_binarize(ytest_2, classes=list(sleep_stages.keys()))
+```
+
+Ahora observamos los resultado para el paciente número 2.
+
+```{python}
+observe_results(predict_model_XGBoost(modelos, Xtest_2.values), ytest_bin_2)
+```
+
+Obtenemos resultados muy buenos para todos los modelos, a excepción del modelo de la fase `N2` que ahora obtiene un rendimiento notablemente inferior al mostrado previamente.
+
+```{python}
+comparar_hipnogramas(ytest_2,procesar_filas(predict_model_XGBoost(modelos, Xtest_2.values)))
+```
+
+# 7. Comparación con el artículo de referencia
+
+Por último, realizaremos una comparación con los resultados del artículo original publicado por la Universidad de Coímbra. Analizaremos los resultados de cada una de las métricas incluidas en el artículo para el subgrupo III, que es el que se ha utilizado en este proyecto.
+
+Para ello, primero crearemos un dataframe con todos los datos para que sea más sencillo observar las diferencias.
+
+```{python}
+# Hacer print en la misma columna
+pd.set_option('display.width', 1000)
+pd.set_option('display.max_columns', None)
+
+# Guardamos todas las métricas en una lista
+metricas_finales = [metricas_Wake, metricas_N1, metricas_N2, metricas_N3, metricas_REM]
+
+# Resultados del artículo (sin intervalos de confianza)
+resultados_articulo = [{"AUC": 0.9277, "Especificidad": 0.9303, "Sensibilidad": 0.9336, "Accuracy": 0.9343},
+                       {"AUC": 0.7235, "Especificidad": 0.7971, "Sensibilidad": 0.7341, "Accuracy": 0.7591},
+                       {"AUC": 0.7958, "Especificidad": 0.8261, "Sensibilidad": 0.8686, "Accuracy": 0.8715},
+                       {"AUC": 0.9141, "Especificidad": 0.8337, "Sensibilidad": 0.9193, "Accuracy": 0.9438},
+                       {"AUC": 0.8650, "Especificidad": 0.8786, "Sensibilidad": 0.8919, "Accuracy": 0.9146}]
+columnas = ["AUC_Nuestro", "AUC_Articulo", "Spec_Nuestra", "Spec_Articulo", "Sens_Nuestra", "Sens_Articulo", "Acc_Nuestro", "Acc_Articulo"]
+
+tabla_metricas = pd.DataFrame(columns=columnas, index=clases)
+
+for i in range(len(metricas_finales)):
+    tabla_metricas.iloc[i] = [metricas_finales[i]["AUC"], resultados_articulo[i]["AUC"],
+                              metricas_finales[i]["Especificidad"], resultados_articulo[i]["Especificidad"],
+                              metricas_finales[i]["Sensibilidad"], resultados_articulo[i]["Sensibilidad"],
+                              metricas_finales[i]["Accuracy"], resultados_articulo[i]["Accuracy"]]
+    
+tabla_metricas
+```
+
+Para mostrar mejor las diferencias, realizamos otro dataframe que muestre las diferencias entre nuestros modelos y los del artículo. Si el resultado es positivo significa que nuestro modelo es mejor en esa métrica, si es negativo, el modelo utilizado en el artículo es mejor.
+
+```{python}
+metricas_utilizadas = ["AUC", "Especificidad", "Sensibilidad", "Accuracy"]
+
+dif_metricas = pd.DataFrame(columns=metricas_utilizadas, index=clases)
+
+for i in range(len(metricas_finales)):
+    dif_metricas.iloc[i] = [metricas_finales[i]["AUC"] - resultados_articulo[i]["AUC"],
+                            metricas_finales[i]["Especificidad"] - resultados_articulo[i]["Especificidad"],
+                            metricas_finales[i]["Sensibilidad"] - resultados_articulo[i]["Sensibilidad"],
+                            metricas_finales[i]["Accuracy"] - resultados_articulo[i]["Accuracy"]]
+    
+dif_metricas
+```
+
+Ahora analizaremos uno a uno los resultados:
+
+<li>Wake: Obtenemos unos resultados excelentes, solamente tenemos un peor resultado en sensibilidad, pero entra dentro de su intervalo de confianza. En el resto de metricas obtenemos resultados mejores, incluida la especificidad, para la cual obtenemos un resultado mejor que el intervalo de confianza del artículo (de 3.78).</li>
+<li>N1: Obtenemos un resultado mucho mejor en especificidad y accuracy, pero nuestro AUC es peor (aunque dentro de su intervalo de confianza). Lo verdaderamente llamativo es el resultado en sensibilidad, para el cual en el artículo han conseguido un resultado bastante bueno, que no consiguen con ninguno de los otros subgrupos. Nuestro resultado entraría dentro del intervalo de confianza de los otros subgrupos, pero se aleja mucho del obtenido en el artículo en el subgrupo III.</li>
+<li>N2: Los resultados obtenidos son muy similares a los del artículo. Nuestro AUC es mejor, pero se encuentra en el intervalo de confianza del artículo, así como nuestro accuracy, que es peor, pero también está dentro del intervalo. Para la especificidad, hemos obtenido un resultado ligeramente por encima del intervalo de confianza, mientras que para la sensibilidad es ligeramente peor.</li>
+<li>N3: Son los mejores resultados obtenidos en comparación con el artículo. El AUC y la especificidad, pese a estar dentro del intervalo de confianza del artículo, dan resultados mejores, mientras que para la sensibilidad y el accuracy los resultados son prácticamente los mismos.</li>
+<li>REM: Pese a que el resultado en especificidad se encuentra por encima de su intervalo de confianza y el resultado en accuracy es ligeramente mejor, nuestros resultados en AUC y sensibilidad están por debajo del intervalo. Llama la atención especialmente la sensibilidad, la cual se encuentra bastante por debajo del intervalo del artículo.</li>
+
+
+Como conclusión, comparando los resultados con los del artículo de referencia, obtenemos que nuestros modelos ofrecen mejores resultados para la especificidad para todas y cada una de las fases, pero en general los resultados para la sensibilidad son bastante pobres en comparación con el artículo, especialmente para las fases N1 y REM. Por lo tanto, el principal aspecto a mejorar en nuestros modelos es la capacidad para captar estas dos fases cuando el paciente se encuentra en ellas, o lo que es lo mismo, mejorar la sensibilidad obtenida.

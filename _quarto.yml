@@ -1,9 +1,12 @@
 project:
   type: website
   output-dir: "docs"
+  render:
+    - "*.qmd"
 
 website:
   title: "Enrique Sayas Bailach"
+  back-to-top-navigation: true
   navbar:
     left: 
       - text: "Inicio"
@@ -24,6 +27,9 @@ format:
   html:
     theme: cosmo
     css: styles.css
+    toc: true
+    toc_depth: 5
+    toc-title: Contenido
 
 
 

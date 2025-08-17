@@ -2,7 +2,7 @@
 title: "1er Premio en el Concurso de Visualización de Datos de la ciudad de Valencia 2023"
 author: "Josep Antoni Girbés Plaza, Luna Xinping Moreno Gómez, Carles Vicent Adam Castañer, Carlos Gila Blanco, Enrique Sayas Bailach"
 date: "2023-09-22"
-categories: [valencia, ciencia de datos, datos abiertos]
+categories: [valencia, ciencia de datos, datos abiertos, R]
 image: "premio.jpeg"
 ---
 

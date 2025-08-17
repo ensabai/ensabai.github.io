@@ -2,7 +2,7 @@
 title: "Trabajo Fin de Grado - Ciencia de Datos"
 author: "Enrique Sayas Bailach"
 date: "2025-07-10"
-categories: [mascarillas, ciencia de datos, análisis]
+categories: [mascarillas, ciencia de datos, análisis, R]
 image: "escudo_logo_UV.jpg"
 ---
 

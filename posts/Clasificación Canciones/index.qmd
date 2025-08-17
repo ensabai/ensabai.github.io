@@ -2,7 +2,7 @@
 title: "Clasificación de canciones según su género en base a sus características"
 author: "Carlos Gila Blanco, Enrique Sayas Bailach"
 date: "2023-06-20"
-categories: [clasificación, ciencia de datos, música]
+categories: [clasificación, ciencia de datos, música, R]
 image: "GCD.png"
 ---
 

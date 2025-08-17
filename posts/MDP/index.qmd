@@ -2,7 +2,7 @@
 title: "Maximum Diversity Problem (MDP): Implementación de GRASP y Path-relinking."
 author: "Carles Vicent Adam Castañer, Luna Xinping Moreno Gómez, Enrique Sayas Bailach"
 date: "2025-5-16"
-categories: [MDP, ciencia de datos]
+categories: [MDP, ciencia de datos, Python]
 image: "GCD.png"
 ---
 

@@ -2,7 +2,7 @@
 title: "Estación MedioAmbiental Inteligente"
 author: "Carlos Gila Blanco, Enrique Sayas Bailach"
 date: "2025-1-10"
-categories: [IoT, ciencia de datos, PYNQ Z2]
+categories: [IoT, ciencia de datos, PYNQ Z2, Python]
 image: "GCD.png"
 ---
 

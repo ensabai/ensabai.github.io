@@ -47,3 +47,10 @@ po/*~
 rsconnect/
 
 /.quarto/
+
+/_freeze/
+
+*.zip
+*.xlsx
+*.txt
+*.edf
