@@ -435,6 +435,7 @@ def load_features(raw_list, labels_list):
 
         # Eliminamos las 30 epochs (each 30s)
         sls2 = sls.get_features()[:-30]
+        sls2 = sls2.apply(lambda x: StandardScaler().fit_transform(x.values.reshape(-1, 1)).flatten())
         sls2["paciente"] = paciente
         sls2["y"] = labels
 
@@ -453,7 +454,7 @@ sls_pd.describe()
 
 ### 4.3.1 Análisis Exploratorio
 
-1. Seleccionamos las variables no normalizadas
+1. Seleccionamos las variables no normalizadas por la librería yasa
 
 ```{python}
 sls_pd = sls_pd.loc[:, ~sls_pd.columns.str.contains("norm")]
@@ -482,8 +483,9 @@ sleep_stages = {
 
 # Train y Validation
 Xtrain = sls_pd[sls_pd["paciente"] <= 6].iloc[:,:-3].copy()
-
+Xtrain = Xtrain.reset_index(drop = True)
 ytrain = sls_pd[sls_pd["paciente"] <= 6].loc[:,"y"].copy()
+ytrain = ytrain.reset_index(drop = True)
 
 Xval= sls_pd[sls_pd["paciente"] >= 7].iloc[:,:-3].copy()
 yval = sls_pd[sls_pd["paciente"] >= 7].loc[:,"y"].copy()
@@ -575,7 +577,7 @@ Primero creamos dos funciones que nos ayudarán a interpretar los resultados:
 
 ```{python}
 def show_features(model, max_num_features=20):
-    fig, axes = plt.subplots(1, 2, sharex=False, sharey=False, figsize = (20,5))
+    fig, axes = plt.subplots(2, 1, sharex=False, sharey=False, figsize = (8,12))
     contx = 0
 
     for type in ["cover","gain"]:
@@ -628,6 +630,32 @@ Los parámetros elegidos por el grid search son:
 <li>reg_lambda = 3</li>
 
 ```{python}
+ytrain0index = ytrain[ytrain == 0].index
+ytrain1index = ytrain[ytrain == 1].index
+ytrain2index = ytrain[ytrain == 2].index
+ytrain3index = ytrain[ytrain == 3].index
+ytrain4index = ytrain[ytrain == 4].index
+```
+
+```{python}
+from random import sample, seed
+
+seed(1234)
+
+def balanced_data_index(ref_class, class1, class2, class3, class4):
+    indexes = np.concatenate((ref_class.values,
+        class1[sample(range(0, len(class1)), round(len(ref_class) / 4))].values,
+        class2[sample(range(0, len(class2)), round(len(ref_class) / 4))].values,
+        class3[sample(range(0, len(class3)), round(len(ref_class) / 4))].values,
+        class4[sample(range(0, len(class4)), round(len(ref_class) / 4))].values),
+        axis=None)
+    
+    return indexes
+
+ytrainWakeindex = balanced_data_index(ytrain0index, ytrain1index, ytrain2index, ytrain3index, ytrain4index)
+```
+
+```{python}
 modelWake = xgb.XGBClassifier(learning_rate=0.4, 
                               max_depth=5, 
                               min_child_weight=1.0, 
@@ -660,7 +688,7 @@ print("Best Cross-Validation Accuracy:", grid_search.best_score_)
 
 modelWake = grid_search.best_estimator_
 """
-modelWake.fit(Xtrain,ytrain_bin[:,0])
+modelWake.fit(Xtrain.loc[ytrainWakeindex],ytrain_bin[ytrainWakeindex,0])
 ```
 
 ### 5.2.2 Selección de características
@@ -695,9 +723,9 @@ Observamos que entre las variables más importantes y, por tanto, las que mejor 
 ### 5.2.3 Uso de `Surrogate model` para la interpretabilidad
 
 ```{python}
-surrogateWake_labels = modelWake.predict(Xtrain)
+surrogateWake_labels = modelWake.predict(Xtrain.loc[ytrainWakeindex])
 surrogateWake_model = DecisionTreeClassifier(random_state=42, max_depth=5)
-surrogateWake_model.fit(Xtrain,surrogateWake_labels)
+surrogateWake_model.fit(Xtrain.loc[ytrainWakeindex],surrogateWake_labels)
 
 plt.figure(figsize=(20,10))
 plot_tree(surrogateWake_model, filled=True, feature_names=Xtrain.columns, class_names=["Sleep","Wake"])
@@ -733,6 +761,12 @@ Los parámetros obtenidos en el grid search son:
 <li>reg_lambda = 1</li>
 
 ```{python}
+seed(1234)
+
+ytrainN1index = balanced_data_index(ytrain1index, ytrain0index, ytrain2index, ytrain3index, ytrain4index)
+```
+
+```{python}
 modelN1 = xgb.XGBClassifier(learning_rate=0.4, 
                             max_depth=6, 
                             min_child_weight=1.0, 
@@ -765,7 +799,7 @@ print("Best Cross-Validation Accuracy:", grid_search.best_score_)
 
 modelN1 = grid_search.best_estimator_
 """
-modelN1.fit(Xtrain,ytrain_bin[:,1])
+modelN1.fit(Xtrain.loc[ytrainN1index],ytrain_bin[ytrainN1index,1])
 ```
 
 ### 5.3.2 Selección de características
@@ -812,7 +846,7 @@ plt.show()
 ### 5.3.4 Métricas
 
 ```{python}
-metricas_N1 = show_metricas("N1",yval_bin[:,1],modelN1.predict_proba(Xval)[:,1]>0.3)
+metricas_N1 = show_metricas("N1",yval_bin[:,1],modelN1.predict(Xval))
 metricas.append(metricas_N1)
 metricas_N1
 ```
@@ -836,6 +870,12 @@ Los parámetros obtenidos en el grid search son:
 <li>n_estimators = 5000</li>
 <li>reg_alpha = 0</li>
 <li>reg_lambda = 3</li>
+
+```{python}
+seed(1234)
+
+ytrainN2index = balanced_data_index(ytrain2index, ytrain0index, ytrain1index, ytrain3index, ytrain4index)
+```
 
 ```{python}
 modelN2 = xgb.XGBClassifier(learning_rate=0.3, 
@@ -870,7 +910,7 @@ print("Best Cross-Validation Accuracy:", grid_search.best_score_)
 
 modelN2 = grid_search.best_estimator_
 """
-modelN2.fit(Xtrain,ytrain_bin[:,2])
+modelN2.fit(Xtrain.loc[ytrainN2index],ytrain_bin[ytrainN2index,2])
 ```
 
 ### 5.4.2 Selección de características
@@ -943,6 +983,12 @@ Los parámetros obtenidos en el grid search son:
 <li>reg_lambda = 1</li>
 
 ```{python}
+seed(1234)
+
+ytrainN3index = balanced_data_index(ytrain3index, ytrain0index, ytrain1index, ytrain2index, ytrain4index)
+```
+
+```{python}
 modelN3 = xgb.XGBClassifier(learning_rate=0.4, 
                             max_depth=6, 
                             min_child_weight=1.0, 
@@ -974,7 +1020,7 @@ print("Best Parameters:", grid_search.best_params_)
 print("Best Cross-Validation Accuracy:", grid_search.best_score_)
 modelN3 = grid_search.best_estimator_
 """
-modelN3.fit(Xtrain,ytrain_bin[:,3])
+modelN3.fit(Xtrain.loc[ytrainN3index],ytrain_bin[ytrainN3index,3])
 ```
 
 ### 5.5.2 Selección de características
@@ -1047,6 +1093,12 @@ Los parámetros obtenidos en el grid search son:
 <li>reg_lambda = 2</li>
 
 ```{python}
+seed(1234)
+
+ytrainREMindex = balanced_data_index(ytrain4index, ytrain0index, ytrain1index, ytrain2index, ytrain3index)
+```
+
+```{python}
 modelREM = xgb.XGBClassifier(learning_rate=0.4, 
                              max_depth=5, 
                              min_child_weight=1.5, 
@@ -1079,7 +1131,7 @@ print("Best Cross-Validation Accuracy:", grid_search.best_score_)
 
 modelREM = grid_search.best_estimator_
 """
-modelREM.fit(Xtrain,ytrain_bin[:,4])
+modelREM.fit(Xtrain.loc[ytrainREMindex],ytrain_bin[ytrainREMindex,4])
 ```
 
 ### 5.6.2 Selección de características
@@ -1145,10 +1197,7 @@ modelos.append(modelREM)
 def predict_model_XGBoost(modelos, X):
     predicciones = modelos[0].predict(X)
     for col in range(1,5):
-        if col == 1:
-            predicciones = np.column_stack((predicciones,modelos[col].predict_proba(X)[:,1]>0.3))
-        else:
-            predicciones = np.column_stack((predicciones,modelos[col].predict(X)))
+        predicciones = np.column_stack((predicciones,modelos[col].predict(X)))
     return predicciones
 ```
 
@@ -1243,7 +1292,7 @@ Por último, vamos a utilizar el conjunto de test, que será la prueba definitiv
 
 ```{python}
 def comparar_hipnogramas(y_true,y_pred):
-    fig, axes = plt.subplots(1, 2, sharex=False, sharey=False, figsize = (20,5))
+    fig, axes = plt.subplots(2, 1, sharex=False, sharey=False, figsize = (8,12))
 
     yasa.plot_hypnogram(y_true,ax=axes[0], fill_color="thistle")
     axes[0].set_title("Original")
