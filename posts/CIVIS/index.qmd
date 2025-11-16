@@ -1,0 +1,9 @@
+---
+title: "La Diputación pone a disposición de los ayuntamientos una aplicación para mejorar la gestión de las quejas ciudadanas"
+author: "Digital Value, Diputación de Valencia, Enrique Sayas Bailach"
+date: "2025-11-10"
+categories: [CIVIS, Digital Value, Diputación de Valencia]
+image: "dival.png"
+---
+
+![https://www.dival.es/es/sala-premsa/la-diputacion-pone-a-disposicion-de-los-ayuntamientos-una-aplicacion-para-mejorar-la-gestion-de-las-quejas-ciudadanas](reunion.JPG){width="100%"}
