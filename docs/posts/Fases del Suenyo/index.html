@@ -105,7 +105,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+
+
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -318,7 +321,7 @@ window.Quarto = {
 </section>
 <section id="librerías" class="level1">
 <h1>1. Librerías</h1>
-<div id="5e12c918" class="cell" data-execution_count="1">
+<div id="9292224b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mne</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> yasa</span>
@@ -381,7 +384,7 @@ window.Quarto = {
 </section>
 <section id="carga-de-los-datos" class="level2">
 <h2 class="anchored" data-anchor-id="carga-de-los-datos">3.2 Carga de los datos</h2>
-<div id="772b7f31" class="cell" data-execution_count="2">
+<div id="129a2a0c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_raw(test<span class="op">=</span><span class="va">False</span>):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    raw_list <span class="op">=</span> []</span>
@@ -436,7 +439,7 @@ window.Quarto = {
 <span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>A continuación se cargan los primeros 8 pacientes, los cuales serán utilizados para el conjunto de entrenamiento y validación.</p>
-<div id="89bd6af2" class="cell" data-execution_count="3">
+<div id="fa9e278b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>raw_train_list <span class="op">=</span> load_raw()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="etiquetas-de-fases-del-sueño" class="level3">
@@ -470,7 +473,7 @@ window.Quarto = {
 </li>
 <li>4 = Sueño REM</li>
 </ul>
-<div id="99f5b562" class="cell" data-execution_count="4">
+<div id="47d4759c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_labels(test<span class="op">=</span><span class="va">False</span>):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    labels_list <span class="op">=</span> []</span>
@@ -569,7 +572,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div id="8b5621ba" class="cell" data-execution_count="5">
+<div id="2172b1f9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>observe_hypnogram(labels_train_list)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>C:\Users\enriq\AppData\Local\miniconda3\envs\ads\Lib\site-packages\yasa\plotting.py:89: FutureWarning: 'S' is deprecated and will be removed in a future version. Please use 's' instead of 'S'.
@@ -903,7 +906,7 @@ En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.
 </section>
 <section id="extracción-de-características-1" class="level2">
 <h2 class="anchored" data-anchor-id="extracción-de-características-1">4.3 Extracción de características</h2>
-<div id="a916caa5" class="cell" data-execution_count="6">
+<div id="a07278e6" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_features(raw_list, labels_list):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    sls_pd <span class="op">=</span> pd.DataFrame()</span>
@@ -929,7 +932,7 @@ En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.
 <span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>sls_pd <span class="op">=</span> load_features(raw_train_list, labels_train_list)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="07e1a561" class="cell" data-execution_count="7">
+<div id="1562d088" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sls_pd.describe()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div>
@@ -1167,7 +1170,7 @@ En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.
 <ol type="1">
 <li>Seleccionamos las variables no normalizadas por la librería yasa</li>
 </ol>
-<div id="65b1fed8" class="cell" data-execution_count="8">
+<div id="1b0ecc56" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sls_pd <span class="op">=</span> sls_pd.loc[:, <span class="op">~</span>sls_pd.columns.<span class="bu">str</span>.contains(<span class="st">"norm"</span>)]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sls_pd</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
@@ -1500,7 +1503,7 @@ En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.
 <ol start="2" type="1">
 <li>Creación de un reporte .html sobre las variables a utilizar.</li>
 </ol>
-<div id="e2b4f6fd" class="cell" data-execution_count="9">
+<div id="9dcdd1ec" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate automated report and save it to HTML (comentado debido a su gran coste computacional)</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># profile = ProfileReport(sls_pd, title="Sleep Stage Data")</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># profile.to_file("eda.html")</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1508,7 +1511,7 @@ En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.
 <ol start="3" type="1">
 <li>Dividir el conjunto de datos en Entrenamiento y Validación. Binarizar la variable objetivo.</li>
 </ol>
-<div id="3e7ffb4f" class="cell" data-execution_count="10">
+<div id="3142d4f9" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a mapping for sleep stages</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sleep_stages <span class="op">=</span> {</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>: <span class="st">'Wake'</span>,</span>
@@ -1535,7 +1538,7 @@ En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.
 <section id="visualización" class="level3">
 <h3 class="anchored" data-anchor-id="visualización">4.3.2 Visualización</h3>
 <p>Cambiamos los números de la variable objetivo por los nombres de las etapas correspondientes.</p>
-<div id="197bba56" class="cell" data-execution_count="11">
+<div id="ad4326aa" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sleep_stages <span class="op">=</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>: <span class="st">'Wake'</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>: <span class="st">'N1'</span>,</span>
@@ -1875,7 +1878,7 @@ En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.
 </div>
 </div>
 <p>Hacemos el data frame tidy para poder realizar gráficos exploratorios.</p>
-<div id="9bf20908" class="cell" data-execution_count="12">
+<div id="f00d4dc7" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sls_pd_tidy <span class="op">=</span> sls_pd_tidy.melt(id_vars <span class="op">=</span> [<span class="st">"paciente"</span>,<span class="st">"y"</span>], value_vars <span class="op">=</span> sls_pd_tidy.columns[:<span class="op">-</span><span class="dv">2</span>])</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sls_pd_tidy</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
@@ -1978,7 +1981,7 @@ En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.
 </div>
 </div>
 <p>Realizamos un boxplot para las variables <code>eeg_abspow</code> y <code>eog_skew</code> para ver las diferencias que muestran en cada fase del sueño. Este gráfico, entre otros, se mostrará en el dashboard final al que tendrá acceso el médico.</p>
-<div id="5ee03875" class="cell" data-execution_count="13">
+<div id="8112e2e1" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.catplot(data<span class="op">=</span>sls_pd_tidy[sls_pd_tidy[<span class="st">"variable"</span>].isin([<span class="st">"eeg_abspow"</span>,<span class="st">"eog_skew"</span>])], y<span class="op">=</span><span class="st">"value"</span>, hue<span class="op">=</span><span class="st">"y"</span>, col<span class="op">=</span><span class="st">"variable"</span>, kind <span class="op">=</span> <span class="st">"box"</span>, sharey<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Eliminar la leyenda automática</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>g._legend.remove()</span>
@@ -1996,7 +1999,7 @@ En EOG: Actividad ocular lenta, típica de las primeras etapas del sueño.
 <p>Para la variable <code>eeg_abspow</code> observamos cómo obtiene valores más altos y mucha mayor varianza para las fases <code>Wake</code> y <code>N3</code>, mientras que para las otras muestra valores relativamente similares y una menor varianza.</p>
 <p>Para la variable <code>eog_skew</code> los valores son muy similares para todas las fases del sueño. La diferencia radica en la varianza en cada fase. Se puede observar cómo para la fase <code>N3</code> la varianza es notablemente menor que en las demás, mientras que en las fase <code>REM</code> y, en menor medida, en la fase <code>Wake</code> observamos una varianza muy elevada.</p>
 <p>Ahora realizamos una matriz de correlación que muestra las correlaciones que tienen las variables del dataset entre sí.</p>
-<div id="a2a2b435" class="cell" data-execution_count="14">
+<div id="6ba54471" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>plt.imshow(np.corrcoef(Xtrain, rowvar <span class="op">=</span> <span class="va">False</span>), cmap <span class="op">=</span><span class="st">"viridis"</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -2055,7 +2058,7 @@ show_features: Muestra las 20 variables más importantes para el modelo en orden
 <li>
 show_metricas: Muestra un total de 8 métricas para analizar los resultados del modelo.
 </li>
-<div id="17f4d4ab" class="cell" data-execution_count="15">
+<div id="32bcda6a" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_features(model, max_num_features<span class="op">=</span><span class="dv">20</span>):</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, sharex<span class="op">=</span><span class="va">False</span>, sharey<span class="op">=</span><span class="va">False</span>, figsize <span class="op">=</span> (<span class="dv">8</span>,<span class="dv">12</span>))</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    contx <span class="op">=</span> <span class="dv">0</span></span>
@@ -2120,14 +2123,14 @@ reg_alpha = 0.5
 <li>
 reg_lambda = 3
 </li>
-<div id="30fa11ef" class="cell" data-execution_count="16">
+<div id="881df64e" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>ytrain0index <span class="op">=</span> ytrain[ytrain <span class="op">==</span> <span class="dv">0</span>].index</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ytrain1index <span class="op">=</span> ytrain[ytrain <span class="op">==</span> <span class="dv">1</span>].index</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ytrain2index <span class="op">=</span> ytrain[ytrain <span class="op">==</span> <span class="dv">2</span>].index</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>ytrain3index <span class="op">=</span> ytrain[ytrain <span class="op">==</span> <span class="dv">3</span>].index</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>ytrain4index <span class="op">=</span> ytrain[ytrain <span class="op">==</span> <span class="dv">4</span>].index</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="78c3df13" class="cell" data-execution_count="17">
+<div id="af9cf28a" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> random <span class="im">import</span> sample, seed</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>seed(<span class="dv">1234</span>)</span>
@@ -2144,11 +2147,11 @@ reg_lambda = 3
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>ytrainWakeindex <span class="op">=</span> balanced_data_index(ytrain0index, ytrain1index, ytrain2index, ytrain3index, ytrain4index)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="43fda00c" class="cell" data-execution_count="18">
+<div id="9411b92d" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>modelWake <span class="op">=</span> xgb.XGBClassifier(learning_rate<span class="op">=</span><span class="fl">0.4</span>, </span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                              max_depth<span class="op">=</span><span class="dv">5</span>, </span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                              min_child_weight<span class="op">=</span><span class="fl">1.0</span>, </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                              n_estimators<span class="op">=</span><span class="dv">1000</span>, </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                              n_estimators<span class="op">=</span><span class="dv">20</span>, </span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                              reg_alpha<span class="op">=</span><span class="fl">0.5</span>, </span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                              reg_lambda<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
@@ -2665,7 +2668,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
               learning_rate=0.4, max_bin=None, max_cat_threshold=None,
               max_cat_to_onehot=None, max_delta_step=None, max_depth=5,
               max_leaves=None, min_child_weight=1.0, missing=nan,
-              monotone_constraints=None, multi_strategy=None, n_estimators=1000,
+              monotone_constraints=None, multi_strategy=None, n_estimators=20,
               n_jobs=None, num_parallel_tree=None, ...)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked=""><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>XGBClassifier</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.0.0/python/python_api.html#xgboost.XGBClassifier">?<span>Documentation for XGBClassifier</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
         <div class="estimator-table">
             <details>
@@ -2816,7 +2819,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <tr class="user-set odd">
 <td><em></em></td>
 <td class="param">n_estimators&nbsp;</td>
-<td class="value">1000</td>
+<td class="value">20</td>
 </tr>
 <tr class="user-set even">
 <td><em></em></td>
@@ -2927,7 +2930,7 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <section id="selección-de-características" class="level3">
 <h3 class="anchored" data-anchor-id="selección-de-características">5.2.2 Selección de características</h3>
 <p>Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.</p>
-<div id="ac86f111" class="cell" data-execution_count="19">
+<div id="5506bfac" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.TreeExplainer(modelWake)</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>shap_values_Wake <span class="op">=</span> explainer.shap_values(Xtrain)</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>shap_values_Wake.shape</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2935,7 +2938,7 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <pre><code>(5130, 49)</code></pre>
 </div>
 </div>
-<div id="b71ca394" class="cell" data-execution_count="20">
+<div id="77b26c1d" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>shap.summary_plot(shap_values_Wake, Xtrain, show<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -2957,12 +2960,12 @@ eeg_higuchi: Al contrario que en el caso anterior, los valores más altos signif
 eeg_at: Al igual que en la variable eeg_higuchi, pero de manera menos clara, los valores más altos de esta variable indicarán que el paciente está despierto.
 </li>
 <p>Ahora mostramos por pantalla las variables más importantes para el modelo y observamos si coinciden.</p>
-<div id="4b36493b" class="cell" data-execution_count="21">
+<div id="3b226189" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>show_features(modelWake)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-22-output-1.png" width="728" height="1062" class="figure-img"></p>
+<p><img src="index_files/figure-html/cell-22-output-1.png" width="722" height="1062" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -2971,7 +2974,7 @@ eeg_at: Al igual que en la variable eeg_higuchi, pero de manera menos clara, los
 </section>
 <section id="uso-de-surrogate-model-para-la-interpretabilidad" class="level3">
 <h3 class="anchored" data-anchor-id="uso-de-surrogate-model-para-la-interpretabilidad">5.2.3 Uso de <code>Surrogate model</code> para la interpretabilidad</h3>
-<div id="966179b5" class="cell" data-execution_count="22">
+<div id="c6124eba" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>surrogateWake_labels <span class="op">=</span> modelWake.predict(Xtrain.loc[ytrainWakeindex])</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>surrogateWake_model <span class="op">=</span> DecisionTreeClassifier(random_state<span class="op">=</span><span class="dv">42</span>, max_depth<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>surrogateWake_model.fit(Xtrain.loc[ytrainWakeindex],surrogateWake_labels)</span>
@@ -2990,23 +2993,23 @@ eeg_at: Al igual que en la variable eeg_higuchi, pero de manera menos clara, los
 </section>
 <section id="métricas" class="level3">
 <h3 class="anchored" data-anchor-id="métricas">5.2.4 Métricas</h3>
-<div id="386d5383" class="cell" data-execution_count="23">
+<div id="5dd7513f" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>metricas_Wake <span class="op">=</span> show_metricas(<span class="st">"Wake"</span>,yval_bin[:,<span class="dv">0</span>],modelWake.predict(Xval))</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>metricas.append(metricas_Wake)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>metricas_Wake</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="23">
 <pre><code>{'Modelo': 'Wake',
- 'Accuracy': 0.9446978335233751,
- 'Precision': 0.9859437751004017,
- 'AP': 0.8845271121913789,
- 'AUC': 0.9195635299693475,
- 'Sensibilidad': 0.8450946643717728,
+ 'Accuracy': 0.9412770809578107,
+ 'Precision': 0.9857723577235772,
+ 'AP': 0.8776229076513284,
+ 'AUC': 0.91440001878174,
+ 'Sensibilidad': 0.8347676419965576,
  'Especificidad': 0.9940323955669225,
- 'F-Score': 0.9101019462465245}</code></pre>
+ 'F-Score': 0.9040074557315937}</code></pre>
 </div>
 </div>
 <p>El modelo obtenido ofrece unas métricas muy buenas, todas ellas por encima de 0.9, con una gran sensibilidad y especificidad.</p>
-<div id="b48d2258" class="cell" data-execution_count="24">
+<div id="2d20086a" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>modelos.append(modelWake)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -3035,16 +3038,16 @@ reg_alpha = 0.5
 <li>
 reg_lambda = 1
 </li>
-<div id="30524d48" class="cell" data-execution_count="25">
+<div id="2cdfebfa" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>seed(<span class="dv">1234</span>)</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>ytrainN1index <span class="op">=</span> balanced_data_index(ytrain1index, ytrain0index, ytrain2index, ytrain3index, ytrain4index)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="7485e549" class="cell" data-execution_count="26">
+<div id="9ec86733" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>modelN1 <span class="op">=</span> xgb.XGBClassifier(learning_rate<span class="op">=</span><span class="fl">0.4</span>, </span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                            max_depth<span class="op">=</span><span class="dv">6</span>, </span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                            min_child_weight<span class="op">=</span><span class="fl">1.0</span>, </span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                            n_estimators<span class="op">=</span><span class="dv">1000</span>, </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                            n_estimators<span class="op">=</span><span class="dv">20</span>, </span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                            reg_alpha<span class="op">=</span><span class="fl">0.5</span>, </span>
 <span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                            reg_lambda<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
@@ -3561,7 +3564,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
               learning_rate=0.4, max_bin=None, max_cat_threshold=None,
               max_cat_to_onehot=None, max_delta_step=None, max_depth=6,
               max_leaves=None, min_child_weight=1.0, missing=nan,
-              monotone_constraints=None, multi_strategy=None, n_estimators=1000,
+              monotone_constraints=None, multi_strategy=None, n_estimators=20,
               n_jobs=None, num_parallel_tree=None, ...)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" checked=""><label for="sk-estimator-id-2" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>XGBClassifier</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.0.0/python/python_api.html#xgboost.XGBClassifier">?<span>Documentation for XGBClassifier</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
         <div class="estimator-table">
             <details>
@@ -3712,7 +3715,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <tr class="user-set odd">
 <td><em></em></td>
 <td class="param">n_estimators&nbsp;</td>
-<td class="value">1000</td>
+<td class="value">20</td>
 </tr>
 <tr class="user-set even">
 <td><em></em></td>
@@ -3823,7 +3826,7 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <section id="selección-de-características-1" class="level3">
 <h3 class="anchored" data-anchor-id="selección-de-características-1">5.3.2 Selección de características</h3>
 <p>Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.</p>
-<div id="986b2721" class="cell" data-execution_count="27">
+<div id="938024e9" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.TreeExplainer(modelN1)</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>shap_values_N1 <span class="op">=</span> explainer.shap_values(Xtrain)</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>shap_values_N1.shape</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3831,7 +3834,7 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <pre><code>(5130, 49)</code></pre>
 </div>
 </div>
-<div id="d9a02bac" class="cell" data-execution_count="28">
+<div id="d1943bd3" class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>shap.summary_plot(shap_values_N1, Xtrain, show<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -3853,12 +3856,12 @@ eeg_abspow: Al contrario que en el caso anterior, aunque con muchas más excepci
 eeg_iqr: Al igual que en la variable eeg_abspow, y con menos excpeciones en los valores extremos, los valores más bajos de esta variable indicarán que el paciente está en la fase N1.
 </li>
 <p>Ahora mostramos las variables más importantes para el modelo y observamos si coinciden con el resultado obtenido en Shap.</p>
-<div id="4eca05c0" class="cell" data-execution_count="29">
+<div id="3ac1ab0a" class="cell" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>show_features(modelN1)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-30-output-1.png" width="763" height="1062" class="figure-img"></p>
+<p><img src="index_files/figure-html/cell-30-output-1.png" width="733" height="1062" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -3867,7 +3870,7 @@ eeg_iqr: Al igual que en la variable eeg_abspow, y con menos excpeciones en los 
 </section>
 <section id="uso-de-surrogate-model-para-la-interpretabilidad-1" class="level3">
 <h3 class="anchored" data-anchor-id="uso-de-surrogate-model-para-la-interpretabilidad-1">5.3.3 Uso de <code>Surrogate model</code> para la interpretabilidad</h3>
-<div id="328aca18" class="cell" data-execution_count="30">
+<div id="4f792380" class="cell" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>surrogateN1_labels <span class="op">=</span> modelN1.predict(Xtrain)</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>surrogateN1_model <span class="op">=</span> DecisionTreeClassifier(random_state<span class="op">=</span><span class="dv">42</span>, max_depth<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>surrogateN1_model.fit(Xtrain,surrogateN1_labels)</span>
@@ -3886,23 +3889,23 @@ eeg_iqr: Al igual que en la variable eeg_abspow, y con menos excpeciones en los 
 </section>
 <section id="métricas-1" class="level3">
 <h3 class="anchored" data-anchor-id="métricas-1">5.3.4 Métricas</h3>
-<div id="59d1cade" class="cell" data-execution_count="31">
+<div id="201e8f8a" class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>metricas_N1 <span class="op">=</span> show_metricas(<span class="st">"N1"</span>,yval_bin[:,<span class="dv">1</span>],modelN1.predict(Xval))</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>metricas.append(metricas_N1)</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>metricas_N1</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="31">
 <pre><code>{'Modelo': 'N1',
- 'Accuracy': 0.822690992018244,
- 'Precision': 0.3194805194805195,
- 'AP': 0.2564018662782949,
- 'AUC': 0.7747515655778673,
- 'Sensibilidad': 0.7151162790697675,
- 'Especificidad': 0.8343868520859671,
- 'F-Score': 0.44165170556552963}</code></pre>
+ 'Accuracy': 0.8129988597491448,
+ 'Precision': 0.3097560975609756,
+ 'AP': 0.25437090232454657,
+ 'AUC': 0.7797423044130186,
+ 'Sensibilidad': 0.7383720930232558,
+ 'Especificidad': 0.8211125158027813,
+ 'F-Score': 0.436426116838488}</code></pre>
 </div>
 </div>
 <p>Tal y como suponíamos, es bastante complicado obtener grandes resultados para esta etapa. Pese a tener un muy buen accuracy y especificidad, sus valores para el AP y la sensibilidad son muy bajos. Por lo tanto, se puede concluir que el rendimiento de este modelo es bastante inferior al del modelo anterior.</p>
-<div id="eeb54d17" class="cell" data-execution_count="32">
+<div id="00646c1d" class="cell" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>modelos.append(modelN1)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -3931,16 +3934,16 @@ reg_alpha = 0
 <li>
 reg_lambda = 3
 </li>
-<div id="4555e119" class="cell" data-execution_count="33">
+<div id="0f732c10" class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>seed(<span class="dv">1234</span>)</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>ytrainN2index <span class="op">=</span> balanced_data_index(ytrain2index, ytrain0index, ytrain1index, ytrain3index, ytrain4index)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="d617c27b" class="cell" data-execution_count="34">
+<div id="9bed7e77" class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>modelN2 <span class="op">=</span> xgb.XGBClassifier(learning_rate<span class="op">=</span><span class="fl">0.3</span>, </span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>                            max_depth<span class="op">=</span><span class="dv">5</span>, </span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                            min_child_weight<span class="op">=</span><span class="fl">1.5</span>, </span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>                            n_estimators<span class="op">=</span><span class="dv">5000</span>, </span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>                            n_estimators<span class="op">=</span><span class="dv">20</span>, </span>
 <span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>                            reg_alpha<span class="op">=</span><span class="dv">0</span>, </span>
 <span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>                            reg_lambda<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
@@ -4457,7 +4460,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
               learning_rate=0.3, max_bin=None, max_cat_threshold=None,
               max_cat_to_onehot=None, max_delta_step=None, max_depth=5,
               max_leaves=None, min_child_weight=1.5, missing=nan,
-              monotone_constraints=None, multi_strategy=None, n_estimators=5000,
+              monotone_constraints=None, multi_strategy=None, n_estimators=20,
               n_jobs=None, num_parallel_tree=None, ...)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" checked=""><label for="sk-estimator-id-3" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>XGBClassifier</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.0.0/python/python_api.html#xgboost.XGBClassifier">?<span>Documentation for XGBClassifier</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
         <div class="estimator-table">
             <details>
@@ -4608,7 +4611,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <tr class="user-set odd">
 <td><em></em></td>
 <td class="param">n_estimators&nbsp;</td>
-<td class="value">5000</td>
+<td class="value">20</td>
 </tr>
 <tr class="user-set even">
 <td><em></em></td>
@@ -4719,7 +4722,7 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <section id="selección-de-características-2" class="level3">
 <h3 class="anchored" data-anchor-id="selección-de-características-2">5.4.2 Selección de características</h3>
 <p>Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.</p>
-<div id="dd48a914" class="cell" data-execution_count="35">
+<div id="85967a8d" class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.TreeExplainer(modelN2)</span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>shap_values_N2 <span class="op">=</span> explainer.shap_values(Xtrain)</span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>shap_values_N2.shape</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -4727,7 +4730,7 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <pre><code>(5130, 49)</code></pre>
 </div>
 </div>
-<div id="9e661f99" class="cell" data-execution_count="36">
+<div id="d7ff4d09" class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>shap.summary_plot(shap_values_N2, Xtrain, show<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -4749,12 +4752,12 @@ eeg_kurt: De la misma manera que en el caso anterior, los valores más altos sig
 eeg_fdelta: Al igual que en las variables anteriores, pero con mayor claridad en los valores extremos, los valores más altos de esta variable indicarán que el paciente está en la fase N2.
 </li>
 <p>Ahora mostramos las variables más importantes para el modelo y observamos si coinciden con el resultado obtenido en Shap.</p>
-<div id="03cc85d3" class="cell" data-execution_count="37">
+<div id="f5be9839" class="cell" data-execution_count="37">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>show_features(modelN2)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-38-output-1.png" width="801" height="1062" class="figure-img"></p>
+<p><img src="index_files/figure-html/cell-38-output-1.png" width="734" height="1062" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -4763,7 +4766,7 @@ eeg_fdelta: Al igual que en las variables anteriores, pero con mayor claridad en
 </section>
 <section id="uso-de-surrogate-model-para-la-interpretabilidad-2" class="level3">
 <h3 class="anchored" data-anchor-id="uso-de-surrogate-model-para-la-interpretabilidad-2">5.4.3 Uso de <code>Surrogate model</code> para la interpretabilidad</h3>
-<div id="21429d19" class="cell" data-execution_count="38">
+<div id="95e887d9" class="cell" data-execution_count="38">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>surrogateN2_labels <span class="op">=</span> modelN2.predict(Xtrain)</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>surrogateN2_model <span class="op">=</span> DecisionTreeClassifier(random_state<span class="op">=</span><span class="dv">42</span>, max_depth<span class="op">=</span><span class="dv">6</span>)</span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>surrogateN2_model.fit(Xtrain,surrogateN2_labels)</span>
@@ -4782,23 +4785,23 @@ eeg_fdelta: Al igual que en las variables anteriores, pero con mayor claridad en
 </section>
 <section id="métricas-2" class="level3">
 <h3 class="anchored" data-anchor-id="métricas-2">5.4.4 Métricas</h3>
-<div id="88c42c3f" class="cell" data-execution_count="39">
+<div id="5956e785" class="cell" data-execution_count="39">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>metricas_N2 <span class="op">=</span> show_metricas(<span class="st">"N2"</span>,yval_bin[:,<span class="dv">2</span>],modelN2.predict(Xval))</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>metricas.append(metricas_N2)</span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>metricas_N2</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="39">
 <pre><code>{'Modelo': 'N2',
- 'Accuracy': 0.806157354618016,
- 'Precision': 0.5076400679117148,
- 'AP': 0.46341853586567117,
- 'AUC': 0.8251639152025614,
- 'Sensibilidad': 0.8567335243553008,
- 'Especificidad': 0.7935943060498221,
- 'F-Score': 0.6375266524520256}</code></pre>
+ 'Accuracy': 0.7941847206385405,
+ 'Precision': 0.4902597402597403,
+ 'AP': 0.45103211732741294,
+ 'AUC': 0.8209209842049985,
+ 'Sensibilidad': 0.8653295128939829,
+ 'Especificidad': 0.7765124555160142,
+ 'F-Score': 0.6259067357512953}</code></pre>
 </div>
 </div>
 <p>El resultado obtenido es bastante decente. Pese a tener una precisión bastante baja, su accuracy, su sensibilidad y su especificidad son bastante buenos (&gt;0.8), por lo tanto se puede concluir que se trata de un modelo bastante bueno.</p>
-<div id="8b84b783" class="cell" data-execution_count="40">
+<div id="bcf4f91a" class="cell" data-execution_count="40">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>modelos.append(modelN2)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -4827,16 +4830,16 @@ reg_alpha = 0.5
 <li>
 reg_lambda = 1
 </li>
-<div id="264dd0ed" class="cell" data-execution_count="41">
+<div id="9d27b9b4" class="cell" data-execution_count="41">
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>seed(<span class="dv">1234</span>)</span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>ytrainN3index <span class="op">=</span> balanced_data_index(ytrain3index, ytrain0index, ytrain1index, ytrain2index, ytrain4index)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="6779dea7" class="cell" data-execution_count="42">
+<div id="843d11f3" class="cell" data-execution_count="42">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>modelN3 <span class="op">=</span> xgb.XGBClassifier(learning_rate<span class="op">=</span><span class="fl">0.4</span>, </span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>                            max_depth<span class="op">=</span><span class="dv">6</span>, </span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>                            min_child_weight<span class="op">=</span><span class="fl">1.0</span>, </span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>                            n_estimators<span class="op">=</span><span class="dv">1000</span>, </span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>                            n_estimators<span class="op">=</span><span class="dv">20</span>, </span>
 <span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>                            reg_alpha<span class="op">=</span><span class="fl">0.5</span>, </span>
 <span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>                            reg_lambda<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
@@ -5352,7 +5355,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
               learning_rate=0.4, max_bin=None, max_cat_threshold=None,
               max_cat_to_onehot=None, max_delta_step=None, max_depth=6,
               max_leaves=None, min_child_weight=1.0, missing=nan,
-              monotone_constraints=None, multi_strategy=None, n_estimators=1000,
+              monotone_constraints=None, multi_strategy=None, n_estimators=20,
               n_jobs=None, num_parallel_tree=None, ...)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" checked=""><label for="sk-estimator-id-4" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>XGBClassifier</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.0.0/python/python_api.html#xgboost.XGBClassifier">?<span>Documentation for XGBClassifier</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
         <div class="estimator-table">
             <details>
@@ -5503,7 +5506,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <tr class="user-set odd">
 <td><em></em></td>
 <td class="param">n_estimators&nbsp;</td>
-<td class="value">1000</td>
+<td class="value">20</td>
 </tr>
 <tr class="user-set even">
 <td><em></em></td>
@@ -5614,7 +5617,7 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <section id="selección-de-características-3" class="level3">
 <h3 class="anchored" data-anchor-id="selección-de-características-3">5.5.2 Selección de características</h3>
 <p>Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.</p>
-<div id="116cba83" class="cell" data-execution_count="43">
+<div id="2e0378d5" class="cell" data-execution_count="43">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.TreeExplainer(modelN3)</span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>shap_values_N3 <span class="op">=</span> explainer.shap_values(Xtrain)</span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>shap_values_N3.shape</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -5622,12 +5625,12 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <pre><code>(5130, 49)</code></pre>
 </div>
 </div>
-<div id="6506569b" class="cell" data-execution_count="44">
+<div id="a824d24e" class="cell" data-execution_count="44">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>shap.summary_plot(shap_values_N3, Xtrain, show<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-45-output-1.png" width="731" height="900" class="figure-img"></p>
+<p><img src="index_files/figure-html/cell-45-output-1.png" width="733" height="900" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -5644,12 +5647,12 @@ eeg_iqr: Al igual que en el caso anterior, los valores más altos significarán 
 eog_higuchi: Al contrario que en las variables anteriores, los valores más altos de esta variable indicarán que el paciente no está en la fase N3, y lo más altos, que sí.
 </li>
 <p>Ahora mostramos las variables más importantes para el modelo y observamos si coinciden con el resultado obtenido en Shap.</p>
-<div id="9fd92d85" class="cell" data-execution_count="45">
+<div id="c5a32517" class="cell" data-execution_count="45">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>show_features(modelN3)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-46-output-1.png" width="720" height="1062" class="figure-img"></p>
+<p><img src="index_files/figure-html/cell-46-output-1.png" width="718" height="1062" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -5658,7 +5661,7 @@ eog_higuchi: Al contrario que en las variables anteriores, los valores más alto
 </section>
 <section id="uso-de-surrogate-model-para-la-interpretabilidad-3" class="level3">
 <h3 class="anchored" data-anchor-id="uso-de-surrogate-model-para-la-interpretabilidad-3">5.5.3 Uso de <code>Surrogate model</code> para la interpretabilidad</h3>
-<div id="e3caa0ff" class="cell" data-execution_count="46">
+<div id="51bb7c6c" class="cell" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>surrogateN3_labels <span class="op">=</span> modelN3.predict(Xtrain)</span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>surrogateN3_model <span class="op">=</span> DecisionTreeClassifier(random_state<span class="op">=</span><span class="dv">42</span>, max_depth<span class="op">=</span><span class="dv">6</span>)</span>
 <span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>surrogateN3_model.fit(Xtrain,surrogateN3_labels)</span>
@@ -5677,23 +5680,23 @@ eog_higuchi: Al contrario que en las variables anteriores, los valores más alto
 </section>
 <section id="métricas-3" class="level3">
 <h3 class="anchored" data-anchor-id="métricas-3">5.5.4 Métricas</h3>
-<div id="9ddc1f55" class="cell" data-execution_count="47">
+<div id="17ba3f61" class="cell" data-execution_count="47">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>metricas_N3 <span class="op">=</span> show_metricas(<span class="st">"N3"</span>,yval_bin[:,<span class="dv">3</span>],modelN3.predict(Xval))</span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>metricas.append(metricas_N3)</span>
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>metricas_N3</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="47">
 <pre><code>{'Modelo': 'N3',
- 'Accuracy': 0.9236031927023945,
- 'Precision': 0.7952069716775599,
- 'AP': 0.7394730286156378,
- 'AUC': 0.9157766612671481,
- 'Sensibilidad': 0.9012345679012346,
- 'Especificidad': 0.9303187546330616,
- 'F-Score': 0.8449074074074074}</code></pre>
+ 'Accuracy': 0.927023945267959,
+ 'Precision': 0.8030634573304157,
+ 'AP': 0.7493790596813219,
+ 'AUC': 0.9197283767582755,
+ 'Sensibilidad': 0.9061728395061729,
+ 'Especificidad': 0.933283914010378,
+ 'F-Score': 0.851508120649652}</code></pre>
 </div>
 </div>
 <p>Los valores obtenidos en las métricas son muy buenos, con un accuracy, una sensibilidad y una especificidad de más de 0.9, podemos afirmar que el modelo en cuestión obtiene unos resultados muy buenos.</p>
-<div id="b67c107e" class="cell" data-execution_count="48">
+<div id="abe2c133" class="cell" data-execution_count="48">
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>modelos.append(modelN3)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -5722,16 +5725,16 @@ reg_alpha = 0.5
 <li>
 reg_lambda = 2
 </li>
-<div id="3039a30e" class="cell" data-execution_count="49">
+<div id="69890d78" class="cell" data-execution_count="49">
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>seed(<span class="dv">1234</span>)</span>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>ytrainREMindex <span class="op">=</span> balanced_data_index(ytrain4index, ytrain0index, ytrain1index, ytrain2index, ytrain3index)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="33c8f5d9" class="cell" data-execution_count="50">
+<div id="eac02de1" class="cell" data-execution_count="50">
 <div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>modelREM <span class="op">=</span> xgb.XGBClassifier(learning_rate<span class="op">=</span><span class="fl">0.4</span>, </span>
 <span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>                             max_depth<span class="op">=</span><span class="dv">5</span>, </span>
 <span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>                             min_child_weight<span class="op">=</span><span class="fl">1.5</span>, </span>
-<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>                             n_estimators<span class="op">=</span><span class="dv">1000</span>, </span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>                             n_estimators<span class="op">=</span><span class="dv">20</span>, </span>
 <span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>                             reg_alpha<span class="op">=</span><span class="fl">0.5</span>, </span>
 <span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>                             reg_lambda<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
@@ -6248,7 +6251,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
               learning_rate=0.4, max_bin=None, max_cat_threshold=None,
               max_cat_to_onehot=None, max_delta_step=None, max_depth=5,
               max_leaves=None, min_child_weight=1.5, missing=nan,
-              monotone_constraints=None, multi_strategy=None, n_estimators=1000,
+              monotone_constraints=None, multi_strategy=None, n_estimators=20,
               n_jobs=None, num_parallel_tree=None, ...)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" checked=""><label for="sk-estimator-id-5" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>XGBClassifier</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.0.0/python/python_api.html#xgboost.XGBClassifier">?<span>Documentation for XGBClassifier</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
         <div class="estimator-table">
             <details>
@@ -6399,7 +6402,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <tr class="user-set odd">
 <td><em></em></td>
 <td class="param">n_estimators&nbsp;</td>
-<td class="value">1000</td>
+<td class="value">20</td>
 </tr>
 <tr class="user-set even">
 <td><em></em></td>
@@ -6510,7 +6513,7 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <section id="selección-de-características-4" class="level3">
 <h3 class="anchored" data-anchor-id="selección-de-características-4">5.6.2 Selección de características</h3>
 <p>Primero, utilizaremos los valores de Shapley (Shap) para obtener las variables más importantes y cómo afectan estas al modelo.</p>
-<div id="bd286d38" class="cell" data-execution_count="51">
+<div id="c18fbc40" class="cell" data-execution_count="51">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.TreeExplainer(modelREM)</span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>shap_values_REM <span class="op">=</span> explainer.shap_values(Xtrain)</span>
 <span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>shap_values_REM.shape</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -6518,12 +6521,12 @@ document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
 <pre><code>(5130, 49)</code></pre>
 </div>
 </div>
-<div id="4e3b9f9b" class="cell" data-execution_count="52">
+<div id="116633ac" class="cell" data-execution_count="52">
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>shap.summary_plot(shap_values_REM, Xtrain, show<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-53-output-1.png" width="733" height="900" class="figure-img"></p>
+<p><img src="index_files/figure-html/cell-53-output-1.png" width="732" height="900" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -6540,12 +6543,12 @@ emg_nzc: Al igual que en el caso anterior, y aparentemente de manera bastante m�
 emg_iqr: Al igual que en las variables anteriores, pero de manera menos clara salvo para los valores muy elevados, los valores más altos de esta variable indicarán que el paciente no está en la fase REM.
 </li>
 <p>Ahora mostramos las variables más importantes para el modelo y observamos si coinciden con el resultado obtenido en Shap.</p>
-<div id="78a3c527" class="cell" data-execution_count="53">
+<div id="39ebe79d" class="cell" data-execution_count="53">
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>show_features(modelREM)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-54-output-1.png" width="726" height="1062" class="figure-img"></p>
+<p><img src="index_files/figure-html/cell-54-output-1.png" width="718" height="1062" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -6554,7 +6557,7 @@ emg_iqr: Al igual que en las variables anteriores, pero de manera menos clara sa
 </section>
 <section id="uso-de-surrogate-model-para-la-interpretabilidad-4" class="level3">
 <h3 class="anchored" data-anchor-id="uso-de-surrogate-model-para-la-interpretabilidad-4">5.6.3 Uso de <code>Surrogate model</code> para la interpretabilidad</h3>
-<div id="2c70d45d" class="cell" data-execution_count="54">
+<div id="60468ee1" class="cell" data-execution_count="54">
 <div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>surrogateREM_labels <span class="op">=</span> modelREM.predict(Xtrain)</span>
 <span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>surrogateREM_model <span class="op">=</span> DecisionTreeClassifier(random_state<span class="op">=</span><span class="dv">42</span>, max_depth<span class="op">=</span><span class="dv">6</span>)</span>
 <span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>surrogateREM_model.fit(Xtrain,surrogateREM_labels)</span>
@@ -6573,23 +6576,23 @@ emg_iqr: Al igual que en las variables anteriores, pero de manera menos clara sa
 </section>
 <section id="métricas-4" class="level3">
 <h3 class="anchored" data-anchor-id="métricas-4">5.6.4 Métricas</h3>
-<div id="9c8ec7e4" class="cell" data-execution_count="55">
+<div id="8e2d5881" class="cell" data-execution_count="55">
 <div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>metricas_REM <span class="op">=</span> show_metricas(<span class="st">"REM"</span>,yval_bin[:,<span class="dv">4</span>],modelREM.predict(Xval))</span>
 <span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>metricas.append(metricas_REM)</span>
 <span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>metricas_REM</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="55">
 <pre><code>{'Modelo': 'REM',
- 'Accuracy': 0.951539338654504,
- 'Precision': 0.7579617834394905,
- 'AP': 0.73547487159571,
- 'AUC': 0.956565716266062,
- 'Sensibilidad': 0.9635627530364372,
- 'Especificidad': 0.9495686794956868,
- 'F-Score': 0.8484848484848485}</code></pre>
+ 'Accuracy': 0.9486887115165337,
+ 'Precision': 0.7492063492063492,
+ 'AP': 0.7221122639654717,
+ 'AUC': 0.9515217782601572,
+ 'Sensibilidad': 0.9554655870445344,
+ 'Especificidad': 0.9475779694757797,
+ 'F-Score': 0.8398576512455516}</code></pre>
 </div>
 </div>
 <p>Obtenemos una especificidad excelente, así como grandes resultados en accuracy y precisión. Su principal debilidad es una sensibilidad bastante baja, por lo que se trata de un modelo bueno, pero no ideal.</p>
-<div id="a99341d2" class="cell" data-execution_count="56">
+<div id="7bd0b863" class="cell" data-execution_count="56">
 <div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>modelos.append(modelREM)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -6598,7 +6601,7 @@ emg_iqr: Al igual que en las variables anteriores, pero de manera menos clara sa
 <h2 class="anchored" data-anchor-id="modelo-global">5.7 Modelo Global</h2>
 <section id="creación-del-modelo-5" class="level3">
 <h3 class="anchored" data-anchor-id="creación-del-modelo-5">5.7.1 Creación del modelo</h3>
-<div id="2ac3b649" class="cell" data-execution_count="57">
+<div id="b2172cd1" class="cell" data-execution_count="57">
 <div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict_model_XGBoost(modelos, X):</span>
 <span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>    predicciones <span class="op">=</span> modelos[<span class="dv">0</span>].predict(X)</span>
 <span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">5</span>):</span>
@@ -6609,24 +6612,24 @@ emg_iqr: Al igual que en las variables anteriores, pero de manera menos clara sa
 <section id="métricas-5" class="level3">
 <h3 class="anchored" data-anchor-id="métricas-5">5.7.2 Métricas</h3>
 <p>Ahora utilizaremos el conjunto de validación separado anteriormente para observar los resultados con un conjunto nuevo de datos antes de hacerlo con el test.</p>
-<div id="d6335a97" class="cell" data-execution_count="58">
+<div id="8900f621" class="cell" data-execution_count="58">
 <div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>pred_global <span class="op">=</span> predict_model_XGBoost(modelos,Xval)</span>
 <span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>metricas_global <span class="op">=</span> show_metricas(<span class="st">"Global"</span>, yval_bin, pred_global, <span class="va">True</span>)</span>
 <span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>metricas.append(metricas_global)</span>
 <span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>metricas_global</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="58">
 <pre><code>{'Modelo': 'Global',
- 'Accuracy': 0.621436716077537,
- 'Precision': 0.7492735179156995,
- 'AP': 0.6158590829093387,
+ 'Accuracy': 0.5997719498289624,
+ 'Precision': 0.7453860355993854,
+ 'AP': 0.6109034501900164,
  'AUC': None,
- 'Sensibilidad': 0.8643101482326112,
+ 'Sensibilidad': 0.8648802736602053,
  'Especificidad': None,
- 'F-Score': 0.7861991923648894}</code></pre>
+ 'F-Score': 0.781665167260113}</code></pre>
 </div>
 </div>
 <p>Creamos una matriz de confusión que nos ayuden a observar la proporción de los valores acertados, así como cuál ha sido la predicción cuando no ha acertado.</p>
-<div id="6bf8dd64" class="cell" data-execution_count="59">
+<div id="07b315cb" class="cell" data-execution_count="59">
 <div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> procesar_filas(predicciones):</span>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> []</span>
 <span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>    </span>
@@ -6660,15 +6663,15 @@ emg_iqr: Al igual que en las variables anteriores, pero de manera menos clara sa
 <div class="cell-output cell-output-stdout">
 <pre><code>Tabla de proporciones:
           Wake        N1        N2        N3       REM        -2
-Wake  0.845095  0.129088  0.017212  0.000000  0.001721  0.006885
-N1    0.017442  0.703488  0.226744  0.005814  0.046512  0.000000
-N2    0.008596  0.206304  0.687679  0.080229  0.005731  0.011461
-N3    0.002469  0.007407  0.254321  0.735802  0.000000  0.000000
-REM   0.000000  0.238866  0.076923  0.000000  0.672065  0.012146</code></pre>
+Wake  0.834768  0.141136  0.015491  0.000000  0.001721  0.006885
+N1    0.023256  0.720930  0.197674  0.000000  0.034884  0.023256
+N2    0.005731  0.232092  0.673352  0.071633  0.002865  0.014327
+N3    0.002469  0.009877  0.288889  0.698765  0.000000  0.000000
+REM   0.000000  0.234818  0.080972  0.000000  0.668016  0.016194</code></pre>
 </div>
 </div>
 <p>En general, obtenemos unos resultados bastante decentes, puesto que en general obtenemos resultados de 0.75-0.8 en la mayoría de las métricas, lo que indica que los modelos en general son bastante buenos y tienen altas capacidades. Asimismo, destaca como el 25% de los N1 no ha sido capaz de identificarlos y que el 35% lo ha identificado como N2. Por otro lado, la fase REM tampoco ofrece seguridad ya que el 24% lo ha asignado a N2 y el 21% no ha sido capaz de identificarlo. De este modo, se puede concluir que estas son las dos etapas más difíciles de predecir.</p>
-<div id="3f3320df" class="cell" data-execution_count="60">
+<div id="43457d7b" class="cell" data-execution_count="60">
 <div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>metricas <span class="op">=</span> pd.DataFrame(metricas)</span>
 <span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>metricas</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="60">
@@ -6693,68 +6696,68 @@ REM   0.000000  0.238866  0.076923  0.000000  0.672065  0.012146</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>Wake</td>
-<td>0.944698</td>
-<td>0.985944</td>
-<td>0.884527</td>
-<td>0.919564</td>
-<td>0.845095</td>
+<td>0.941277</td>
+<td>0.985772</td>
+<td>0.877623</td>
+<td>0.914400</td>
+<td>0.834768</td>
 <td>0.994032</td>
-<td>0.910102</td>
+<td>0.904007</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>N1</td>
-<td>0.822691</td>
-<td>0.319481</td>
-<td>0.256402</td>
-<td>0.774752</td>
-<td>0.715116</td>
-<td>0.834387</td>
-<td>0.441652</td>
+<td>0.812999</td>
+<td>0.309756</td>
+<td>0.254371</td>
+<td>0.779742</td>
+<td>0.738372</td>
+<td>0.821113</td>
+<td>0.436426</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>N2</td>
-<td>0.806157</td>
-<td>0.507640</td>
-<td>0.463419</td>
-<td>0.825164</td>
-<td>0.856734</td>
-<td>0.793594</td>
-<td>0.637527</td>
+<td>0.794185</td>
+<td>0.490260</td>
+<td>0.451032</td>
+<td>0.820921</td>
+<td>0.865330</td>
+<td>0.776512</td>
+<td>0.625907</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>N3</td>
-<td>0.923603</td>
-<td>0.795207</td>
-<td>0.739473</td>
-<td>0.915777</td>
-<td>0.901235</td>
-<td>0.930319</td>
-<td>0.844907</td>
+<td>0.927024</td>
+<td>0.803063</td>
+<td>0.749379</td>
+<td>0.919728</td>
+<td>0.906173</td>
+<td>0.933284</td>
+<td>0.851508</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>REM</td>
-<td>0.951539</td>
-<td>0.757962</td>
-<td>0.735475</td>
-<td>0.956566</td>
-<td>0.963563</td>
-<td>0.949569</td>
-<td>0.848485</td>
+<td>0.948689</td>
+<td>0.749206</td>
+<td>0.722112</td>
+<td>0.951522</td>
+<td>0.955466</td>
+<td>0.947578</td>
+<td>0.839858</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
 <td>Global</td>
-<td>0.621437</td>
-<td>0.749274</td>
-<td>0.615859</td>
+<td>0.599772</td>
+<td>0.745386</td>
+<td>0.610903</td>
 <td>NaN</td>
-<td>0.864310</td>
+<td>0.864880</td>
 <td>NaN</td>
-<td>0.786199</td>
+<td>0.781665</td>
 </tr>
 </tbody>
 </table>
@@ -6764,7 +6767,7 @@ REM   0.000000  0.238866  0.076923  0.000000  0.672065  0.012146</code></pre>
 </div>
 <p>Observando todos los resultados juntos, vemos cómo el accuracy se ve penalizado al utilizar el conjunto de validación, pero el resto de variables dan aproximadamente el resultado esperado al observar su comportamiento previo.</p>
 <p>Ahora creamos una nueva función que nos permite reproducir la curva ROC para cada uno de los modelos en base a sus predicciones.</p>
-<div id="b839af15" class="cell" data-execution_count="61">
+<div id="836d48ab" class="cell" data-execution_count="61">
 <div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> observe_results(pred, y):</span>
 <span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (label,col) <span class="kw">in</span> <span class="bu">zip</span>(sleep_stages.values(),np.arange(y.shape[<span class="dv">1</span>])):</span>
@@ -6776,14 +6779,14 @@ REM   0.000000  0.238866  0.076923  0.000000  0.672065  0.012146</code></pre>
 <span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Primero, observamos los resultados si utilizamos el conjunto de entrenamiento.</p>
-<div id="660fa54d" class="cell" data-execution_count="62">
+<div id="83ba32a1" class="cell" data-execution_count="62">
 <div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>observe_results(predict_model_XGBoost(modelos, Xtrain), ytrain_bin)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Wake AUC: 0.978418
-N1 AUC: 0.915008
-N2 AUC: 0.969835
-N3 AUC: 0.965119
-REM AUC: 0.977268</code></pre>
+<pre><code>Wake AUC: 0.976426
+N1 AUC: 0.910535
+N2 AUC: 0.923798
+N3 AUC: 0.964856
+REM AUC: 0.975826</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -6795,14 +6798,14 @@ REM AUC: 0.977268</code></pre>
 </div>
 <p>La curva ROC que obtenemos es perfecta para todos los modelos, lo cual significa que puede predecir los datos del conjunto de entrenamiento a la perfección. Esto en general no se trata de un reflejo de las capacidades del modelo, puesto que estos son los datos con los que ha sido entrenado. A continuación se realizarán pruebas que serán más importantes a la hora de justificar la bondad de los modelos.</p>
 <p>Ahora utilizamos el conjunto de validación.</p>
-<div id="85364bb4" class="cell" data-execution_count="63">
+<div id="a93864c8" class="cell" data-execution_count="63">
 <div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>observe_results(predict_model_XGBoost(modelos, Xval.values), yval_bin)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Wake AUC: 0.919564
-N1 AUC: 0.774752
-N2 AUC: 0.825164
-N3 AUC: 0.915777
-REM AUC: 0.956566</code></pre>
+<pre><code>Wake AUC: 0.914400
+N1 AUC: 0.779742
+N2 AUC: 0.820921
+N3 AUC: 0.919728
+REM AUC: 0.951522</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -6819,7 +6822,7 @@ REM AUC: 0.956566</code></pre>
 <section id="uso-del-conjunto-de-test" class="level1">
 <h1>6. Uso del conjunto de test</h1>
 <p>Por último, vamos a utilizar el conjunto de test, que será la prueba definitiva para todos nuestros modelos. Dentro de este conjunto tenemos a dos pacientes, los cuales será tratados y analizados de manera independiente.</p>
-<div id="32ef5390" class="cell" data-execution_count="64">
+<div id="e396373a" class="cell" data-execution_count="64">
 <div class="sourceCode cell-code" id="cb79"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> comparar_hipnogramas(y_true,y_pred):</span>
 <span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, sharex<span class="op">=</span><span class="va">False</span>, sharey<span class="op">=</span><span class="va">False</span>, figsize <span class="op">=</span> (<span class="dv">8</span>,<span class="dv">12</span>))</span>
 <span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -6832,7 +6835,7 @@ REM AUC: 0.956566</code></pre>
 <span id="cb79-10"><a href="#cb79-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Primero, cargamos los datos del conjunto de test y los observamos.</p>
-<div id="34b82c18" class="cell" data-execution_count="65">
+<div id="804167c5" class="cell" data-execution_count="65">
 <div class="sourceCode cell-code" id="cb80"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>raw_test_list <span class="op">=</span> load_raw(test<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>labels_test_list <span class="op">=</span> load_labels(test<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>sls_test_pd <span class="op">=</span> load_features(raw_test_list, labels_test_list)</span>
@@ -7165,19 +7168,19 @@ REM AUC: 0.956566</code></pre>
 </div>
 </div>
 </div>
-<div id="4f345c36" class="cell" data-execution_count="66">
+<div id="2114ee55" class="cell" data-execution_count="66">
 <div class="sourceCode cell-code" id="cb81"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>Xtest_1 <span class="op">=</span> sls_test_pd[sls_test_pd[<span class="st">"paciente"</span>] <span class="op">==</span> <span class="dv">1</span>].iloc[:,:<span class="op">-</span><span class="dv">3</span>].copy()</span>
 <span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>ytest_1 <span class="op">=</span> sls_test_pd[sls_test_pd[<span class="st">"paciente"</span>] <span class="op">==</span> <span class="dv">1</span>].loc[:,<span class="st">"y"</span>].copy()</span>
 <span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>ytest_bin_1 <span class="op">=</span> label_binarize(ytest_1, classes<span class="op">=</span><span class="bu">list</span>(sleep_stages.keys()))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="25318ecf" class="cell" data-execution_count="67">
+<div id="5c771440" class="cell" data-execution_count="67">
 <div class="sourceCode cell-code" id="cb82"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>observe_results(predict_model_XGBoost(modelos, Xtest_1.values), ytest_bin_1)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Wake AUC: 0.944198
-N1 AUC: 0.767631
-N2 AUC: 0.868442
-N3 AUC: 0.928917
-REM AUC: 0.945260</code></pre>
+<pre><code>Wake AUC: 0.934963
+N1 AUC: 0.762694
+N2 AUC: 0.855985
+N3 AUC: 0.931139
+REM AUC: 0.943548</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -7189,7 +7192,7 @@ REM AUC: 0.945260</code></pre>
 </div>
 <p>Los resultados son excelentes, los modelos que tenían peor rendimiento en el conjunto de validación, lo han mejorado sustancialmente en el test del primer paciente. Los modelos con mejor resultado anteriormente han mostrado un rendimiento ligeramente peor, pero siguen obteniendo resultados muy competentes.</p>
 <p>Mostramos el hipnograma del primer paciente.</p>
-<div id="71f50ae3" class="cell" data-execution_count="68">
+<div id="78c4368b" class="cell" data-execution_count="68">
 <div class="sourceCode cell-code" id="cb84"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>comparar_hipnogramas(ytest_1,procesar_filas(predict_model_XGBoost(modelos, Xtest_1.values)))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>C:\Users\enriq\AppData\Local\miniconda3\envs\ads\Lib\site-packages\yasa\plotting.py:89: FutureWarning: 'S' is deprecated and will be removed in a future version. Please use 's' instead of 'S'.
@@ -7205,20 +7208,20 @@ C:\Users\enriq\AppData\Local\miniconda3\envs\ads\Lib\site-packages\yasa\plotting
 </div>
 </div>
 </div>
-<div id="53fe0a75" class="cell" data-execution_count="69">
+<div id="d8d5c221" class="cell" data-execution_count="69">
 <div class="sourceCode cell-code" id="cb86"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>Xtest_2 <span class="op">=</span> sls_test_pd[sls_test_pd[<span class="st">"paciente"</span>] <span class="op">==</span> <span class="dv">2</span>].iloc[:,:<span class="op">-</span><span class="dv">3</span>].copy()</span>
 <span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>ytest_2 <span class="op">=</span> sls_test_pd[sls_test_pd[<span class="st">"paciente"</span>] <span class="op">==</span> <span class="dv">2</span>].loc[:,<span class="st">"y"</span>].copy()</span>
 <span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>ytest_bin_2 <span class="op">=</span> label_binarize(ytest_2, classes<span class="op">=</span><span class="bu">list</span>(sleep_stages.keys()))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Ahora observamos los resultado para el paciente número 2.</p>
-<div id="0630cd4e" class="cell" data-execution_count="70">
+<div id="d122dea9" class="cell" data-execution_count="70">
 <div class="sourceCode cell-code" id="cb87"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>observe_results(predict_model_XGBoost(modelos, Xtest_2.values), ytest_bin_2)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Wake AUC: 0.929504
-N1 AUC: 0.809071
-N2 AUC: 0.755612
-N3 AUC: 0.939725
-REM AUC: 0.775676</code></pre>
+<pre><code>Wake AUC: 0.925567
+N1 AUC: 0.792630
+N2 AUC: 0.740440
+N3 AUC: 0.935138
+REM AUC: 0.792610</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -7229,7 +7232,7 @@ REM AUC: 0.775676</code></pre>
 </div>
 </div>
 <p>Obtenemos resultados muy buenos para todos los modelos, a excepción del modelo de la fase <code>N2</code> que ahora obtiene un rendimiento notablemente inferior al mostrado previamente.</p>
-<div id="1bdd5343" class="cell" data-execution_count="71">
+<div id="19b2e8c3" class="cell" data-execution_count="71">
 <div class="sourceCode cell-code" id="cb89"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>comparar_hipnogramas(ytest_2,procesar_filas(predict_model_XGBoost(modelos, Xtest_2.values)))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>C:\Users\enriq\AppData\Local\miniconda3\envs\ads\Lib\site-packages\yasa\plotting.py:89: FutureWarning: 'S' is deprecated and will be removed in a future version. Please use 's' instead of 'S'.
@@ -7250,7 +7253,7 @@ C:\Users\enriq\AppData\Local\miniconda3\envs\ads\Lib\site-packages\yasa\plotting
 <h1>7. Comparación con el artículo de referencia</h1>
 <p>Por último, realizaremos una comparación con los resultados del artículo original publicado por la Universidad de Coímbra. Analizaremos los resultados de cada una de las métricas incluidas en el artículo para el subgrupo III, que es el que se ha utilizado en este proyecto.</p>
 <p>Para ello, primero crearemos un dataframe con todos los datos para que sea más sencillo observar las diferencias.</p>
-<div id="31f90833" class="cell" data-execution_count="72">
+<div id="e45a8d26" class="cell" data-execution_count="72">
 <div class="sourceCode cell-code" id="cb91"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hacer print en la misma columna</span></span>
 <span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">'display.width'</span>, <span class="dv">1000</span>)</span>
 <span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">'display.max_columns'</span>, <span class="va">None</span>)</span>
@@ -7296,57 +7299,57 @@ C:\Users\enriq\AppData\Local\miniconda3\envs\ads\Lib\site-packages\yasa\plotting
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Wake</td>
-<td>0.919564</td>
+<td>0.9144</td>
 <td>0.9277</td>
 <td>0.994032</td>
 <td>0.9303</td>
-<td>0.845095</td>
+<td>0.834768</td>
 <td>0.9336</td>
-<td>0.944698</td>
+<td>0.941277</td>
 <td>0.9343</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">N1</td>
-<td>0.774752</td>
+<td>0.779742</td>
 <td>0.7235</td>
-<td>0.834387</td>
+<td>0.821113</td>
 <td>0.7971</td>
-<td>0.715116</td>
+<td>0.738372</td>
 <td>0.7341</td>
-<td>0.822691</td>
+<td>0.812999</td>
 <td>0.7591</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">N2</td>
-<td>0.825164</td>
+<td>0.820921</td>
 <td>0.7958</td>
-<td>0.793594</td>
+<td>0.776512</td>
 <td>0.8261</td>
-<td>0.856734</td>
+<td>0.86533</td>
 <td>0.8686</td>
-<td>0.806157</td>
+<td>0.794185</td>
 <td>0.8715</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">N3</td>
-<td>0.915777</td>
+<td>0.919728</td>
 <td>0.9141</td>
-<td>0.930319</td>
+<td>0.933284</td>
 <td>0.8337</td>
-<td>0.901235</td>
+<td>0.906173</td>
 <td>0.9193</td>
-<td>0.923603</td>
+<td>0.927024</td>
 <td>0.9438</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">REM</td>
-<td>0.956566</td>
+<td>0.951522</td>
 <td>0.865</td>
-<td>0.949569</td>
+<td>0.947578</td>
 <td>0.8786</td>
-<td>0.963563</td>
+<td>0.955466</td>
 <td>0.8919</td>
-<td>0.951539</td>
+<td>0.948689</td>
 <td>0.9146</td>
 </tr>
 </tbody>
@@ -7356,7 +7359,7 @@ C:\Users\enriq\AppData\Local\miniconda3\envs\ads\Lib\site-packages\yasa\plotting
 </div>
 </div>
 <p>Para mostrar mejor las diferencias, realizamos otro dataframe que muestre las diferencias entre nuestros modelos y los del artículo. Si el resultado es positivo significa que nuestro modelo es mejor en esa métrica, si es negativo, el modelo utilizado en el artículo es mejor.</p>
-<div id="ca892186" class="cell" data-execution_count="73">
+<div id="2fbddfce" class="cell" data-execution_count="73">
 <div class="sourceCode cell-code" id="cb92"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>metricas_utilizadas <span class="op">=</span> [<span class="st">"AUC"</span>, <span class="st">"Especificidad"</span>, <span class="st">"Sensibilidad"</span>, <span class="st">"Accuracy"</span>]</span>
 <span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>dif_metricas <span class="op">=</span> pd.DataFrame(columns<span class="op">=</span>metricas_utilizadas, index<span class="op">=</span>clases)</span>
@@ -7385,38 +7388,38 @@ C:\Users\enriq\AppData\Local\miniconda3\envs\ads\Lib\site-packages\yasa\plotting
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Wake</td>
-<td>-0.008136</td>
+<td>-0.0133</td>
 <td>0.063732</td>
-<td>-0.088505</td>
-<td>0.010398</td>
+<td>-0.098832</td>
+<td>0.006977</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">N1</td>
-<td>0.051252</td>
-<td>0.037287</td>
-<td>-0.018984</td>
-<td>0.063591</td>
+<td>0.056242</td>
+<td>0.024013</td>
+<td>0.004272</td>
+<td>0.053899</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">N2</td>
-<td>0.029364</td>
-<td>-0.032506</td>
-<td>-0.011866</td>
-<td>-0.065343</td>
+<td>0.025121</td>
+<td>-0.049588</td>
+<td>-0.00327</td>
+<td>-0.077315</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">N3</td>
-<td>0.001677</td>
-<td>0.096619</td>
-<td>-0.018065</td>
-<td>-0.020197</td>
+<td>0.005628</td>
+<td>0.099584</td>
+<td>-0.013127</td>
+<td>-0.016776</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">REM</td>
-<td>0.091566</td>
-<td>0.070969</td>
-<td>0.071663</td>
-<td>0.036939</td>
+<td>0.086522</td>
+<td>0.068978</td>
+<td>0.063566</td>
+<td>0.034089</td>
 </tr>
 </tbody>
 </table>
